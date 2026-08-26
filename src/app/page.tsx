@@ -66,7 +66,7 @@ export default function Home() {
         )}
 
         {/* Search Section */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 sm:-mt-12 relative z-10">
+        <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 ${!searched ? '-mt-8 sm:-mt-12' : 'mt-6'}`}>
           <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 sm:p-8">
             <form onSubmit={handleSearch} className="space-y-4">
               <div className="flex flex-col sm:flex-row gap-3">
