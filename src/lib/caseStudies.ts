@@ -2,6 +2,28 @@ import type { CaseStudy } from './types';
 
 export const caseStudies: CaseStudy[] = [
   {
+    id: 'inovytec-ventway-sparrow',
+    title: 'Inovytec Ventway Sparrow — FDA 510(k) with Parasoft C/C++test',
+    specialty: 'Respiratory / Emergency Ventilators',
+    pathway: '510(k)',
+    sourceUrl: 'https://www.parasoft.com/resources/case-studies/inovytec-achieves-fda-certification-with-customized-static-code-analysis-solution/',
+    sourceLabel: 'Verified Parasoft Case Study',
+    beforeESL: [
+      'Embedded ventilator software needed FDA 510(k) compliance with no static analysis baseline',
+      'No customized rule set mapped to FDA 510(k) certification requirements',
+      'Code quality issues hidden across the embedded C/C++ codebase',
+      'No automated verification workflow before software releases',
+    ],
+    afterESL: [
+      'ESL deployed Parasoft C/C++test with FDA 510(k)-customized static analysis rules',
+      'Every Ventway Sparrow release now runs Parasoft static analysis configured to FDA regulation definitions',
+      '100% of FDA 510(k) certification rules and guidelines passed',
+      'Direct support from ESL (Dani Liezrowice) as Parasoft\u2019s Israeli distributor \u2014 immediate response on any issue',
+      'Code quality improvements achieved alongside full compliance verification',
+    ],
+    result: 'FDA 510(k) certification achieved. Parasoft C/C++test became the testing solution of choice at Inovytec, with ESL providing ongoing local support as Parasoft\u2019s authorized Israeli distributor.',
+  },
+  {
     id: 'cardiac-imaging',
     title: 'AI-Based Cardiac Imaging Device',
     specialty: 'Cardiology / Radiology',

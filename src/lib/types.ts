@@ -74,4 +74,6 @@ export interface CaseStudy {
   afterESL: string[];
   result: string;
   pathway: string;
+  sourceUrl?: string;
+  sourceLabel?: string;
 }

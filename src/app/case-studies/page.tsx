@@ -24,6 +24,13 @@ export default function CaseStudiesPage() {
                 <div className="flex items-center gap-3 mb-4">
                   <span className="text-xs px-3 py-1 rounded-full bg-blue-50 text-blue-600 font-medium">{cs.pathway}</span>
                   <span className="text-xs px-3 py-1 rounded-full bg-gray-100 text-gray-600">{cs.specialty}</span>
+                  {cs.sourceUrl && (
+                    <a href={cs.sourceUrl} target="_blank" rel="noopener noreferrer"
+                       className="ml-auto inline-flex items-center gap-1.5 text-xs px-3 py-1 rounded-full bg-green-50 text-green-700 font-medium border border-green-200 hover:bg-green-100 transition-colors">
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                      {cs.sourceLabel || 'Verified'}
+                    </a>
+                  )}
                 </div>
                 <h2 className="text-xl font-bold text-gray-900 mb-6">{cs.title}</h2>
 
