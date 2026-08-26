@@ -2,7 +2,7 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  serverExternalPackages: ['@xenova/transformers'],
+  serverExternalPackages: ['@huggingface/transformers'],
 };
 
 export default nextConfig;

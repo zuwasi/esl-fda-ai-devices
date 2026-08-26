@@ -93,7 +93,7 @@ class BM25Index {
 
 async function getPipeline(): Promise<PipelineFunction> {
   if (pipeline === null) {
-    const { pipeline: p } = await import('@xenova/transformers');
+    const { pipeline: p } = await import('@huggingface/transformers');
     pipeline = p as PipelineFunction;
   }
   return pipeline;
