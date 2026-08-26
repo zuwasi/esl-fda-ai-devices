@@ -361,6 +361,97 @@ export default function AboutPage() {
           </div>
         </div>
 
+        {/* Attribution & Provenance */}
+        <div id="attribution" className="mb-8 scroll-mt-20">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Built on Open Science</h2>
+          <p className="text-gray-600 mb-6 text-sm">
+            This platform extends an open-source research tool. We credit the original work and
+            are transparent about what we added.
+          </p>
+
+          {/* Original Work */}
+          <div className="bg-white rounded-xl border border-gray-200 p-6 mb-4">
+            <div className="flex items-start gap-3 mb-4">
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center">
+                <svg className="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="font-bold text-gray-900 text-sm mb-1">The Foundation: FDA AI Search</h3>
+                <p className="text-xs text-gray-500">
+                  Paper: <a href="https://arxiv.org/html/2602.00006v1" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">arXiv:2602.00006v1</a> &middot; Published at ML4H 2025 &middot; Licensed CC BY 4.0
+                </p>
+              </div>
+            </div>
+            <p className="text-sm text-gray-600 mb-3">
+              The semantic search engine and device dataset powering this platform originate from
+              <strong> FDA AI Search</strong>, developed by{' '}
+              <strong>Arun Kavishwar</strong> and <strong>William Lotter</strong> at the
+              Dana-Farber Cancer Institute, Brigham and Women&apos;s Hospital, and Harvard Medical School.
+              Their work introduced an embedding-based retrieval system for the 1,200+ FDA-authorized
+              AI-enabled medical devices, using LLM-extracted features (Gemini-2.5-flash) and
+              MedEmbed-small-v0.1 embeddings with a hybrid BM25 + semantic similarity scoring algorithm.
+            </p>
+            <div className="flex flex-wrap gap-3 text-xs">
+              <a href="https://arxiv.org/html/2602.00006v1" target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-700 font-medium border border-indigo-200 hover:bg-indigo-100 transition-colors">
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                Read the Paper
+              </a>
+              <a href="https://fda-ai-search.com" target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-50 text-gray-700 font-medium border border-gray-200 hover:bg-gray-100 transition-colors">
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                Original Tool (fda-ai-search.com)
+              </a>
+              <a href="https://github.com/lotterlab/fda_ai_search" target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-50 text-gray-700 font-medium border border-gray-200 hover:bg-gray-100 transition-colors">
+                <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" /></svg>
+                Source Code (GitHub)
+              </a>
+            </div>
+          </div>
+
+          {/* What ESL Added */}
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200 p-6">
+            <div className="flex items-start gap-3 mb-4">
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #0b4c8a, #1a6cb0)' }}>
+                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+              </div>
+              <div>
+                <h3 className="font-bold text-gray-900 text-sm mb-1">What ESL Built on Top</h3>
+                <p className="text-xs text-gray-500">
+                  Six regulatory-engineering layers added by Engineering Software Lab
+                </p>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {[
+                { title: 'Cybersecurity Evidence Layer', body: 'SBOM presence detection, §524B cyber-device compliance indicators, and CVE management signals per device — powered by SBOMator™.' },
+                { title: 'IEC 62304 Risk Classification', body: 'Automatic Class A / B / C assignment based on device summary analysis, plus FDA device class estimation (Class I / II / III).' },
+                { title: 'Evidence Requirements Mapper', body: 'IEC 62304 evidence requirements mapped to each risk class and regulatory pathway — what the submission actually needs.' },
+                { title: 'Submission Readiness Assessment', body: 'Interactive 3-step wizard producing a gap analysis and prioritized action plan — not just a search result, but a roadmap.' },
+                { title: 'Consultancy Integration', body: 'Verified case studies, scoping-workshop CTAs, and dual-pillar (SBOMator + Parasoft) positioning connecting search to action.' },
+                { title: 'Regulatory Intelligence Workflow', body: 'The "Find it. Understand it. Fix it. Prove it." methodology applied to every device — from discovery to evidence.' },
+              ].map(item => (
+                <div key={item.title} className="bg-white/70 rounded-lg p-3 border border-blue-100">
+                  <h4 className="text-sm font-semibold text-gray-900 mb-1">{item.title}</h4>
+                  <p className="text-xs text-gray-600">{item.body}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-4 p-3 bg-white/50 rounded-lg border border-blue-100">
+              <p className="text-xs text-gray-600">
+                <strong>In short:</strong> The original tool helps you{' '}
+                <em>find</em> FDA-authorized AI devices. ESL&apos;s platform helps you{' '}
+                <em>find, understand, assess, and act on</em> them — connecting each device to the
+                cybersecurity, risk-class, evidence, and submission-readiness context that a regulatory
+                submission actually requires.
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* Disclaimer */}
         <div className="bg-amber-50 rounded-xl border border-amber-200 p-4">
           <p className="text-xs text-amber-800">

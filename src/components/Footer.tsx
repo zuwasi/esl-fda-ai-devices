@@ -1,4 +1,4 @@
-import Image from 'next/image';
+﻿import Image from 'next/image';
 
 export default function Footer() {
   return (
@@ -20,8 +20,8 @@ export default function Footer() {
               <span className="text-lg font-bold text-white">ESL Engineering Software Lab</span>
             </div>
             <p className="text-sm text-gray-400 max-w-md">
-              FDA software evidence services: SBOM &amp; CVE remediation, static analysis &amp; bug fixing,
-              unit testing &amp; code coverage, traceability &amp; audit-ready reports.
+              FDA software evidence services: SBOM & CVE remediation, static analysis & bug fixing,
+              unit testing & code coverage, traceability & audit-ready reports.
               Find it. Understand it. Fix it. Prove it.
             </p>
           </div>
@@ -44,16 +44,25 @@ export default function Footer() {
             </ul>
           </div>
         </div>
-        <div className="mt-8 pt-8 border-t border-gray-700 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p className="text-xs text-gray-500">
-            This platform is an assistive tool and may make errors. Not legal or regulatory advice.
-            The manufacturer retains responsibility for safety, effectiveness, and submissions.
-          </p>
-          <div className="flex items-center gap-4 text-xs text-gray-400">
-            <span>Powered by SBOMator™</span>
-            <span>•</span>
-            <span>Parasoft C/C++test (TÜV SÜD certified)</span>
+        <div className="mt-8 pt-8 border-t border-gray-700 flex flex-col gap-4">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+            <p className="text-xs text-gray-500">
+              This platform is an assistive tool and may make errors. Not legal or regulatory advice.
+              The manufacturer retains responsibility for safety, effectiveness, and submissions.
+            </p>
+            <div className="flex items-center gap-4 text-xs text-gray-400 whitespace-nowrap">
+              <span>Powered by SBOMator</span>
+              <span>|</span>
+              <span>Parasoft C/C++test</span>
+            </div>
           </div>
+          <p className="text-xs text-center text-gray-600">
+            Search engine based on{' '}
+            <a href="https://arxiv.org/html/2602.00006v1" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-gray-300 underline">FDA AI Search</a>{' '}
+            by Kavishwar & Lotter (Dana-Farber / Harvard, ML4H 2025, CC BY 4.0).{' '}
+            Extended with regulatory-engineering layers by ESL.{' '}
+            <a href="/about#attribution" className="text-gray-500 hover:text-gray-300 underline">Details</a>
+          </p>
         </div>
       </div>
     </footer>

@@ -196,6 +196,18 @@ export default function Home() {
             </div>
           </div>
         )}
+
+        {/* Attribution */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <p className="text-xs text-center text-gray-400">
+            Search engine based on{' '}
+            <a href="https://arxiv.org/html/2602.00006v1" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-blue-600 underline">FDA AI Search</a>{' '}
+            by Kavishwar &amp; Lotter (Dana-Farber / Harvard, ML4H 2025, CC BY 4.0).{' '}
+            Regulatory-engineering layers by{' '}
+            <a href="/about" className="text-gray-500 hover:text-blue-600 underline">Engineering Software Lab</a>.{' '}
+            <a href="/about#attribution" className="text-gray-500 hover:text-blue-600 underline">Learn what we added &rarr;</a>
+          </p>
+        </div>
       </main>
       <Footer />
     </div>
