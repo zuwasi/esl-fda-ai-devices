@@ -117,7 +117,12 @@ async function buildBM25Index(records: Record<string, DeviceRecord>): Promise<BM
   if (BM25_INDEX === null) {
     const documents: Record<string, string> = {};
     for (const [id, r] of Object.entries(records)) {
-      const text = [r.summary_keywords, r.thesis, r.concepts].filter(Boolean).join(' ');
+      const text = [
+        r.summary_keywords, r.thesis, r.concepts,
+        r.summary, r.generated_questions, r.search_boost_text,
+        r.clinical_function, r.ai_function, r.ai_function_subclass,
+        r.device_model, r.company,
+      ].filter(Boolean).join(' ');
       if (text.trim()) documents[id] = text;
     }
     BM25_INDEX = new BM25Index(documents);
@@ -251,8 +256,14 @@ function performKeywordSearch(
   if (query) {
     const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
     arr = arr.filter(({ id, record }) => {
-      const text = [record.device_model, record.company, record.thesis, record.summary_keywords, record.concepts, id]
-        .join(' ').toLowerCase();
+      const text = [
+        record.device_model, record.company, record.thesis,
+        record.summary_keywords, record.concepts, id,
+        record.summary, record.generated_questions,
+        record.search_boost_text, record.clinical_function,
+        record.ai_function, record.ai_function_subclass,
+        record.query_match_1, record.query_match_2, record.query_match_3,
+      ].join(' ').toLowerCase();
       return terms.every(t => text.includes(t));
     });
   }

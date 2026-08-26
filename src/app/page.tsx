@@ -29,10 +29,15 @@ export default function Home() {
       const res = await fetch('/api/search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: query.trim(), mode, topK: 50 }),
+        body: JSON.stringify({ query: query.trim(), mode, topK: 50, page: 1, limit: 50 }),
       });
       const data = await res.json();
-      setResults(Array.isArray(data) ? data : []);
+      if (mode === 'keyword' && !Array.isArray(data)) {
+        setResults(data.results || []);
+        setTotalCount(data.totalRecords || 0);
+      } else {
+        setResults(Array.isArray(data) ? data : []);
+      }
     } catch {
       setResults([]);
     }
