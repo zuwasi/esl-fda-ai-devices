@@ -1,3 +1,5 @@
+import Image from 'next/image';
+
 export default function Footer() {
   return (
     <footer className="bg-gray-900 text-gray-300 mt-16">
@@ -8,6 +10,13 @@ export default function Footer() {
               <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #0b4c8a, #1a6cb0)' }}>
                 <span className="text-white font-bold">E</span>
               </div>
+              <Image
+                src="/fda-services-icon.png"
+                alt="FDA Services"
+                width={24}
+                height={24}
+                className="object-contain"
+              />
               <span className="text-lg font-bold text-white">ESL Engineering Software Lab</span>
             </div>
             <p className="text-sm text-gray-400 max-w-md">
