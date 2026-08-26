@@ -1,0 +1,13 @@
+[phases]
+setup = [
+  { pkgs = ["nodejs_22", "npm"], note = "Node.js 22 + npm" }
+]
+
+[phases.build]
+cmds = [
+  "npm ci",
+  "npm run build"
+]
+
+[start]
+cmd = "npm run start"
