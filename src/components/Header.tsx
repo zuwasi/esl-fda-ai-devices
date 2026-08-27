@@ -13,8 +13,8 @@ export default function Header() {
               <Image
                 src="/fda-services-icon.png"
                 alt="FDA Services"
-                width={28}
-                height={28}
+                width={40}
+                height={40}
                 className="object-contain"
               />
               <div>

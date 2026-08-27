@@ -13,8 +13,8 @@ export default function Footer() {
               <Image
                 src="/fda-services-icon.png"
                 alt="FDA Services"
-                width={24}
-                height={24}
+                width={36}
+                height={36}
                 className="object-contain"
               />
               <span className="text-lg font-bold text-white">ESL Engineering Software Lab</span>
