@@ -27,7 +27,8 @@ export default function AboutPage() {
             testing, and evidence tasks in scope.
           </p>
           <div className="flex flex-wrap justify-center gap-3 mt-6">
-            <a href="mailto:sales@eswlab.com?subject=FDA Software Evidence Scoping Workshop"
+            <a href="https://eswlab.com/contact-us/?your-subject=FDA%20Software%20Evidence%20Scoping%20Workshop"
+              target="_blank" rel="noopener noreferrer"
               className="px-6 py-3 text-white font-semibold rounded-lg hover:opacity-90 transition-opacity"
               style={{ background: 'linear-gradient(135deg, #0b4c8a, #1a6cb0)' }}>
               Request a Scoping Workshop
@@ -353,7 +354,8 @@ export default function AboutPage() {
             and ALM environment — then defines the smallest complete work package needed.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
-            <a href="mailto:sales@eswlab.com?subject=FDA Software Evidence Scoping Workshop"
+            <a href="https://eswlab.com/contact-us/?your-subject=FDA%20Software%20Evidence%20Scoping%20Workshop"
+              target="_blank" rel="noopener noreferrer"
               className="inline-block px-8 py-3 bg-white text-blue-800 font-semibold rounded-lg hover:bg-blue-50 transition-colors">
               Request a Scoping Workshop &rarr;
             </a>

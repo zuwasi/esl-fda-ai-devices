@@ -7,9 +7,13 @@ export default function Header() {
         <div className="flex justify-between items-center h-16">
           <a href="/" className="flex items-center gap-2">
             <div className="flex items-center gap-2">
-              <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #0b4c8a, #1a6cb0)' }}>
-                <span className="text-white font-bold text-lg">E</span>
-              </div>
+              <Image
+                src="/esl-icon.png"
+                alt="ESL"
+                width={36}
+                height={36}
+                className="object-contain"
+              />
               <Image
                 src="/fda-services-icon.png"
                 alt="FDA Services"
@@ -28,7 +32,14 @@ export default function Header() {
             <a href="/assessment" className="text-sm font-medium text-gray-600 hover:text-blue-700 px-3 py-2 rounded">Assessment</a>
             <a href="/case-studies" className="text-sm font-medium text-gray-600 hover:text-blue-700 px-3 py-2 rounded">Case Studies</a>
             <a href="/about" className="text-sm font-medium text-gray-600 hover:text-blue-700 px-3 py-2 rounded">About</a>
-            <a href="mailto:sales@eswlab.com" className="hidden sm:inline-block text-sm font-semibold text-white px-4 py-2 rounded-lg" style={{ background: 'linear-gradient(135deg, #0b4c8a, #1a6cb0)' }}>
+            <a href="https://eswlab.com/contact-us/" target="_blank" rel="noopener noreferrer" className="hidden sm:inline-flex items-center gap-2 text-sm font-semibold text-white px-4 py-2 rounded-lg" style={{ background: 'linear-gradient(135deg, #0b4c8a, #1a6cb0)' }}>
+              <Image
+                src="/esl-icon.png"
+                alt="ESL"
+                width={18}
+                height={18}
+                className="object-contain"
+              />
               Contact ESL
             </a>
           </nav>

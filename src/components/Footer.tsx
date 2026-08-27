@@ -7,9 +7,13 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="md:col-span-2">
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #0b4c8a, #1a6cb0)' }}>
-                <span className="text-white font-bold">E</span>
-              </div>
+              <Image
+                src="/esl-icon.png"
+                alt="ESL"
+                width={32}
+                height={32}
+                className="object-contain"
+              />
               <Image
                 src="/fda-services-icon.png"
                 alt="FDA Services"
@@ -37,6 +41,7 @@ export default function Footer() {
           <div>
             <h4 className="text-sm font-semibold text-white mb-3">Contact</h4>
             <ul className="space-y-2 text-sm">
+              <li><a href="https://eswlab.com/contact-us/" target="_blank" rel="noopener noreferrer" className="hover:text-white">Contact Form</a></li>
               <li><a href="mailto:sales@eswlab.com" className="hover:text-white">sales@eswlab.com</a></li>
               <li><a href="https://www.eswlab.com" className="hover:text-white">www.eswlab.com</a></li>
               <li className="text-gray-400">+972 9 8855803</li>

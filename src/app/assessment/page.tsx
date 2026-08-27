@@ -244,7 +244,8 @@ export default function AssessmentPage() {
                 </div>
               </div>
               <div className="flex flex-col sm:flex-row gap-3">
-                <a href="mailto:sales@eswlab.com?subject=FDA Software Evidence Scoping Workshop"
+                <a href="https://eswlab.com/contact-us/?your-subject=FDA%20Software%20Evidence%20Scoping%20Workshop"
+                  target="_blank" rel="noopener noreferrer"
                   className="flex-1 text-center py-3 bg-white text-blue-800 font-semibold rounded-lg hover:bg-blue-50">
                   Schedule Scoping Workshop →
                 </a>
