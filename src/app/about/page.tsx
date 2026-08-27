@@ -39,6 +39,22 @@ export default function AboutPage() {
           </div>
         </div>
 
+        {/* Platform Positioning Statement */}
+        <div className="mb-12 bg-gradient-to-br from-blue-900 to-blue-700 rounded-2xl p-8 text-white">
+          <h2 className="text-xl font-bold mb-3">The Platform in One Sentence</h2>
+          <p className="text-lg text-blue-100 leading-relaxed mb-4">
+            ESL FDA AI Device Intelligence is the only free public platform that combines semantic search
+            of every FDA-authorized AI medical device with live regulatory risk monitoring — recalls,
+            adverse events, and warning letters — plus cybersecurity evidence analysis and IEC 62304 risk
+            classification.
+          </p>
+          <p className="text-base text-blue-200">
+            It transforms FDA&apos;s opaque approval database into actionable intelligence for patients,
+            clinicians, and device manufacturers, while positioning ESL as the go-to consultancy for FDA
+            software evidence and regulatory remediation.
+          </p>
+        </div>
+
         {/* Key Differentiators */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
           {[

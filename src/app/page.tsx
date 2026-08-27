@@ -62,8 +62,9 @@ export default function Home() {
                   Search. Assess. Prepare. Submit.
                 </h1>
                 <p className="text-lg sm:text-xl text-blue-100 mb-8">
-                  Semantic search across all FDA-authorized AI medical devices. Cybersecurity evidence analysis,
-                  IEC 62304 risk classification, and submission readiness assessment.
+                  The only free public platform that combines semantic search of every FDA-authorized AI medical device
+                  with live regulatory risk monitoring — recalls, adverse events, and warning letters — plus cybersecurity
+                  evidence analysis and IEC 62304 risk classification.
                 </p>
               </div>
             </div>
@@ -198,6 +199,48 @@ export default function Home() {
               <StatCard label="Regulatory Pathways" value="3 (510k, De Novo, PMA)" />
               <StatCard label="Clinical Panels" value={filterData.panels.length + ''} />
               <StatCard label="Data Types" value={filterData.dataTypes.length + ''} />
+            </div>
+          </div>
+        )}
+
+        {/* Platform Value Proposition */}
+        {!searched && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+            <div className="bg-gradient-to-br from-blue-900 to-blue-700 rounded-2xl p-8 sm:p-10 text-white">
+              <h2 className="text-2xl font-bold mb-4">Why This Platform Exists</h2>
+              <p className="text-lg text-blue-100 leading-relaxed mb-6 max-w-3xl">
+                ESL FDA AI Device Intelligence transforms FDA&apos;s opaque approval database into actionable
+                intelligence for patients, clinicians, and device manufacturers — while positioning ESL as the
+                go-to consultancy for FDA software evidence and regulatory remediation.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-white/10 rounded-xl p-5">
+                  <div className="text-2xl mb-2">🔍</div>
+                  <h3 className="font-semibold mb-2 text-sm">For the Public &amp; Patients</h3>
+                  <p className="text-sm text-blue-200">
+                    Search every FDA-authorized AI device by what it does. See recalls, adverse events, and
+                    warning letters — live from FDA databases, free, no login.
+                  </p>
+                </div>
+                <div className="bg-white/10 rounded-xl p-5">
+                  <div className="text-2xl mb-2">🏭</div>
+                  <h3 className="font-semibold mb-2 text-sm">For Device Companies</h3>
+                  <p className="text-sm text-blue-200">
+                    Competitive intelligence before you spend millions on a submission. See what pathway
+                    competitors used, what evidence they provided, and what regulatory concerns exist for
+                    comparable devices.
+                  </p>
+                </div>
+                <div className="bg-white/10 rounded-xl p-5">
+                  <div className="text-2xl mb-2">🛡️</div>
+                  <h3 className="font-semibold mb-2 text-sm">For ESL</h3>
+                  <p className="text-sm text-blue-200">
+                    Every search creates a qualified lead. Every regulatory concern links to ESL remediation.
+                    Every assessment connects to a scoping workshop. A public utility that drives consultancy
+                    engagement.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         )}
