@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import CompanyTypeahead from '@/components/CompanyTypeahead';
 
 export default function SearchPage() {
   const [query, setQuery] = useState('');
@@ -96,7 +97,7 @@ export default function SearchPage() {
             <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-4 sticky top-20">
               <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Filters</h3>
               <FilterSelect label="Clinical Panel" value={filters.panel} options={filterData.panels} onChange={v => handleFilterChange('panel', v)} />
-              <FilterSelect label="Company" value={filters.company} options={filterData.companies} onChange={v => handleFilterChange('company', v)} />
+              <CompanyTypeahead label="Company" companies={filterData.companies} value={filters.company} onChange={v => handleFilterChange('company', v)} />
               <FilterSelect label="Regulatory Pathway" value={filters.pathway} options={['510(k)', 'De Novo', 'PMA']} onChange={v => handleFilterChange('pathway', v)} />
               <FilterSelect label="Data Type" value={filters.dataType} options={filterData.dataTypes} onChange={v => handleFilterChange('dataType', v)} />
               <div>

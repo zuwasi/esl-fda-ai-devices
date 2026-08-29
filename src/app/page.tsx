@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import CompanyTypeahead from '@/components/CompanyTypeahead';
 
 export default function Home() {
   const [query, setQuery] = useState('');
@@ -130,7 +131,7 @@ export default function Home() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                   <HomeFilterSelect label="Regulatory Pathway" value={filters.pathway} options={['510(k)', 'De Novo', 'PMA']} onChange={value => setFilters(prev => ({ ...prev, pathway: value }))} />
                   <HomeFilterSelect label="Clinical Panel" value={filters.panel} options={filterData.panels} onChange={value => setFilters(prev => ({ ...prev, panel: value }))} />
-                  <HomeFilterSelect label="Company" value={filters.company} options={filterData.companies} onChange={value => setFilters(prev => ({ ...prev, company: value }))} />
+                  <CompanyTypeahead label="Company" companies={filterData.companies} value={filters.company} onChange={value => setFilters(prev => ({ ...prev, company: value }))} />
                   <HomeFilterSelect label="Data Type" value={filters.dataType} options={filterData.dataTypes} onChange={value => setFilters(prev => ({ ...prev, dataType: value }))} />
                   <label className="block">
                     <span className="block text-xs font-medium text-gray-600 mb-1">FDA Product Code</span>
