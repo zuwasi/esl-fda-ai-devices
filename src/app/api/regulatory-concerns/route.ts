@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import * as XLSX from 'xlsx';
 
 interface RecallResult {
   product_description: string; reason_for_recall: string; root_cause_description: string;
@@ -68,6 +69,75 @@ function formatEvents(response: FdaResponse<AdverseEventResult>) {
   };
 }
 
+interface WarningLetter {
+  postedDate: string;
+  issueDate: string;
+  companyName: string;
+  issuingOffice: string;
+  subject: string;
+  hasResponse: boolean;
+  closeoutDate: string | null;
+}
+
+const WL_CACHE: Record<string, { letters: WarningLetter[]; timestamp: number }> = {};
+const WL_CACHE_TTL = 1000 * 60 * 60 * 24; // 24 hours
+
+async function fetchWarningLetters(companyName: string, primaryName: string): Promise<WarningLetter[]> {
+  const cacheKey = primaryName.toLowerCase();
+  const cached = WL_CACHE[cacheKey];
+  if (cached && Date.now() - cached.timestamp < WL_CACHE_TTL) {
+    return cached.letters;
+  }
+
+  const xlsxUrl = 'https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/compliance-actions-and-activities/warning-letters/datatables-data?search_api_fulltext=' + encodeURIComponent(primaryName) + '&page&_format=xlsx';
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15000);
+
+  try {
+    const response = await fetch(xlsxUrl, {
+      signal: controller.signal,
+      headers: { 'User-Agent': 'ESL-FDA-AI-Device-Intelligence/1.0' },
+    });
+    if (!response.ok) return [];
+
+    const arrayBuffer = await response.arrayBuffer();
+    const wb = XLSX.read(arrayBuffer, { type: 'array' });
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(ws);
+
+    const lowerCompany = companyName.toLowerCase();
+    const lowerPrimary = primaryName.toLowerCase();
+
+    const letters: WarningLetter[] = rows
+      .filter(row => {
+        const rowCompany = String(row['Company Name'] || '').toLowerCase();
+        if (!rowCompany) return false;
+        // Match if the row company contains the primary name or vice versa
+        return rowCompany.includes(lowerPrimary) || lowerCompany.includes(rowCompany) ||
+               rowCompany.includes(lowerCompany.split(' ')[0]) ||
+               lowerPrimary.includes(rowCompany.split(' ')[0]);
+      })
+      .map(row => ({
+        postedDate: String(row['Posted Date'] || ''),
+        issueDate: String(row['Letter Issue Date'] || ''),
+        companyName: String(row['Company Name'] || ''),
+        issuingOffice: String(row['Issuing Office'] || ''),
+        subject: String(row['Subject'] || ''),
+        hasResponse: !!row['Response Letter'],
+        closeoutDate: row['Closeout Letter'] ? String(row['Closeout Letter']) : null,
+      }))
+      .sort((a, b) => (b.issueDate || '').localeCompare(a.issueDate || ''));
+
+    WL_CACHE[cacheKey] = { letters, timestamp: Date.now() };
+    return letters;
+  } catch {
+    return [];
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const company = url.searchParams.get('company');
@@ -82,19 +152,27 @@ export async function GET(req: Request) {
   const eventBase = 'https://api.fda.gov/device/event.json?search=device.manufacturer_d_name:' + encodedName;
 
   try {
-    const [deviceRecalls, companyRecalls, deviceEvents, companyEvents] = await Promise.all([
+    const [deviceRecalls, companyRecalls, deviceEvents, companyEvents, warningLetters] = await Promise.all([
       fetchFda<RecallResult>(recallBase + '+AND+product_description:' + encodedDevice + '&limit=10&sort=event_date_posted:desc'),
       fetchFda<RecallResult>(recallBase + '&limit=10&sort=event_date_posted:desc'),
       fetchFda<AdverseEventResult>(eventBase + '+AND+device.brand_name:' + encodedDevice + '&limit=10&sort=date_received:desc'),
       fetchFda<AdverseEventResult>(eventBase + '&limit=10&sort=date_received:desc'),
+      fetchWarningLetters(company, primaryName),
     ]);
+
+    const fdaWlSearchUrl = 'https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/compliance-actions-and-activities/warning-letters?field_company_name=' + encodeURIComponent(primaryName);
+
     return NextResponse.json({
       company, deviceName,
       deviceSpecific: { recalls: formatRecalls(deviceRecalls), adverseEvents: formatEvents(deviceEvents) },
       companyWide: { recalls: formatRecalls(companyRecalls), adverseEvents: formatEvents(companyEvents) },
       warningLetters: {
-        searchUrl: 'https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/compliance-actions-and-activities/warning-letters?field_company_name=' + encodeURIComponent(primaryName),
-        note: 'FDA Warning Letters are searched on the FDA website. Click to view any warning letters issued to this company.',
+        letters: warningLetters,
+        total: warningLetters.length,
+        searchUrl: fdaWlSearchUrl,
+        note: warningLetters.length > 0
+          ? 'FDA Warning Letters fetched live from FDA.gov. Click a letter to view the full text on FDA.gov.'
+          : 'No warning letters found for this company in FDA records.',
       },
     });
   } catch (error) {
@@ -104,7 +182,7 @@ export async function GET(req: Request) {
       company, deviceName,
       deviceSpecific: { recalls: empty, adverseEvents: empty },
       companyWide: { recalls: empty, adverseEvents: empty },
-      warningLetters: { searchUrl: '', note: 'FDA Warning Letters search is temporarily unavailable.' },
+      warningLetters: { letters: [], total: 0, searchUrl: '', note: 'FDA Warning Letters search is temporarily unavailable.' },
     });
   }
 }

@@ -6,9 +6,19 @@ interface ConcernSet {
   adverseEvents: { total: number; results: Array<{ eventType: string; reportNumber: string; dateReceived: string; deviceName: string; deviceGeneric: string; problems: string; patientImpact: string; description: string }> };
 }
 
+interface WarningLetter {
+  postedDate: string;
+  issueDate: string;
+  companyName: string;
+  issuingOffice: string;
+  subject: string;
+  hasResponse: boolean;
+  closeoutDate: string | null;
+}
+
 interface RegulatoryData {
   company: string; deviceName: string; deviceSpecific: ConcernSet; companyWide: ConcernSet;
-  warningLetters: { searchUrl: string; note: string };
+  warningLetters: { letters: WarningLetter[]; total: number; searchUrl: string; note: string };
 }
 
 function primaryCompanyName(company: string) {
@@ -44,7 +54,8 @@ export default function RegulatoryConcerns({ company, deviceName }: { company: s
       setData(result);
       if (result.deviceSpecific.recalls.total > 0) setTab('recalls');
       else if (result.deviceSpecific.adverseEvents.total > 0) setTab('events');
-      else setTab('warnings');
+      else if (result.warningLetters.total > 0) setTab('warnings');
+      else setTab('recalls');
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Failed to load regulatory concerns.');
     } finally {
@@ -54,7 +65,9 @@ export default function RegulatoryConcerns({ company, deviceName }: { company: s
 
   const concerns = data ? (scope === 'device' ? data.deviceSpecific : data.companyWide) : null;
   const total = (concerns?.recalls.total || 0) + (concerns?.adverseEvents.total || 0);
+  const wlCount = data?.warningLetters.total || 0;
   const deviceTotal = (data?.deviceSpecific.recalls.total || 0) + (data?.deviceSpecific.adverseEvents.total || 0);
+  const totalWithWL = deviceTotal + wlCount;
   const encodedCompany = encodeURIComponent(JSON.stringify(primaryCompanyName(company)));
   const encodedDevice = encodeURIComponent(JSON.stringify(deviceSearchKeywords(deviceName)));
   const recallSearch = 'https://api.fda.gov/device/recall.json?search=recalling_firm:' + encodedCompany + (scope === 'device' ? '+AND+product_description:' + encodedDevice : '') + '&limit=100';
@@ -63,7 +76,7 @@ export default function RegulatoryConcerns({ company, deviceName }: { company: s
   return <>
     <button onClick={handleClick} className={'inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors' + ''}>
       <WarningIcon className={'w-4 h-4' + ''} /> Regulatory Concerns
-      {data && deviceTotal > 0 && <span className={'px-1.5 py-0.5 text-xs rounded-full bg-red-100 text-red-700 font-bold' + ''}>{deviceTotal > 999 ? '999+' : deviceTotal}</span>}
+      {data && totalWithWL > 0 && <span className={'px-1.5 py-0.5 text-xs rounded-full bg-red-100 text-red-700 font-bold' + ''}>{totalWithWL > 999 ? '999+' : totalWithWL}</span>}
     </button>
     {open && <div className={'fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50' + ''} onClick={() => setOpen(false)}>
       <div className={'bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[85vh] overflow-hidden flex flex-col' + ''} onClick={event => event.stopPropagation()}>
@@ -89,7 +102,7 @@ export default function RegulatoryConcerns({ company, deviceName }: { company: s
             <div className={'flex border-b border-gray-200 px-5' + ''}>
               <TabButton active={tab === 'recalls'} onClick={() => setTab('recalls')} label="Recalls" count={concerns.recalls.total} />
               <TabButton active={tab === 'events'} onClick={() => setTab('events')} label="Adverse Events" count={concerns.adverseEvents.total} />
-              <TabButton active={tab === 'warnings'} onClick={() => setTab('warnings')} label="Warning Letters" count={null} />
+              <TabButton active={tab === 'warnings'} onClick={() => setTab('warnings')} label="Warning Letters" count={wlCount} />
             </div>
             <div className={'p-5' + ''}>
               {tab === 'recalls' && <div className={'space-y-3' + ''}>
@@ -102,7 +115,23 @@ export default function RegulatoryConcerns({ company, deviceName }: { company: s
                   <div key={index} className={'bg-white border border-gray-200 rounded-lg p-4' + ''}><div className={'flex justify-between gap-3 mb-2' + ''}><span className={'text-xs px-2 py-1 rounded-full font-medium ' + (event.eventType === 'Death' ? 'bg-red-100 text-red-700' : event.eventType === 'Injury' ? 'bg-orange-100 text-orange-700' : 'bg-yellow-100 text-yellow-700')}>{event.eventType}</span><span className={'text-xs text-gray-400' + ''}>{event.dateReceived}</span></div><p className={'text-sm font-medium text-gray-900' + ''}>{event.deviceName}</p><p className={'text-xs text-gray-500 mb-2' + ''}>{event.deviceGeneric} · Report: {event.reportNumber}</p>{event.problems !== 'N/A' && <p className={'text-sm text-gray-600' + ''}><strong>Problems:</strong> {event.problems}</p>}{event.patientImpact !== 'N/A' && <p className={'text-sm text-gray-600' + ''}><strong>Patient impact:</strong> {event.patientImpact}</p>}{event.description && <p className={'text-xs text-gray-500 mt-2 italic line-clamp-3' + ''}>{event.description}</p>}</div>)}
                 {concerns.adverseEvents.total > concerns.adverseEvents.results.length && <a href={eventSearch} target="_blank" rel="noopener noreferrer" className={'block text-center text-sm text-blue-600 hover:underline py-2' + ''}>View all {concerns.adverseEvents.total.toLocaleString()} results on openFDA →</a>}
               </div>}
-              {tab === 'warnings' && <div className={'bg-amber-50 border border-amber-200 rounded-lg p-4' + ''}><p className={'text-sm text-amber-800 mb-3' + ''}>{data.warningLetters.note}</p><a href={data.warningLetters.searchUrl} target="_blank" rel="noopener noreferrer" className={'inline-flex px-4 py-2 text-sm font-medium text-amber-700 border border-amber-300 rounded-lg hover:bg-amber-100' + ''}>Search FDA Warning Letters for {company}</a></div>}
+              {tab === 'warnings' && <div className={'space-y-3' + ''}>
+                {!data.warningLetters.letters.length ? <EmptyState message="No warning letters found for this company in FDA records." /> : data.warningLetters.letters.map((wl, index) =>
+                  <div key={index} className={'bg-white border border-gray-200 rounded-lg p-4' + ''}>
+                    <div className={'flex justify-between gap-3 mb-2' + ''}>
+                      <span className={'text-xs px-2 py-1 rounded-full font-medium bg-red-100 text-red-700' + ''}>Warning Letter</span>
+                      <span className={'text-xs text-gray-400' + ''}>Issued: {wl.issueDate}</span>
+                    </div>
+                    <p className={'text-sm font-medium text-gray-900 mb-1' + ''}>{wl.subject}</p>
+                    <p className={'text-xs text-gray-500 mb-2' + ''}>{wl.companyName} · {wl.issuingOffice}</p>
+                    <div className={'flex flex-wrap gap-2 mt-2' + ''}>
+                      {wl.hasResponse && <span className={'text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-medium' + ''}>Response Received</span>}
+                      {wl.closeoutDate ? <span className={'text-xs px-2 py-0.5 rounded-full bg-green-50 text-green-700 font-medium' + ''}>Closed Out: {wl.closeoutDate}</span> : <span className={'text-xs px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 font-medium' + ''}>Open / No Closeout</span>}
+                      <span className={'text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600' + ''}>Posted: {wl.postedDate}</span>
+                    </div>
+                  </div>)}
+                {data.warningLetters.searchUrl && <a href={data.warningLetters.searchUrl} target="_blank" rel="noopener noreferrer" className={'block text-center text-sm text-blue-600 hover:underline py-2' + ''}>View full warning letters on FDA.gov →</a>}
+              </div>}
             </div>
             <div className={'mx-5 mb-5 p-4 rounded-lg bg-red-50' + ''}><p className={'text-sm text-red-900 mb-2' + ''}><strong>ESL can help remediate regulatory concerns.</strong> From warning letter responses to recall corrective actions, static analysis remediation, and SBOM/CVE evidence packages.</p><a href="mailto:sales@eswlab.com?subject=Regulatory%20Concerns%20Remediation" className={'text-sm font-medium text-red-700 hover:underline' + ''}>Contact ESL for remediation support →</a></div>
           </>}
