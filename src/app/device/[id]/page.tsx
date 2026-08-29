@@ -166,7 +166,7 @@ export default function DeviceDetailPage() {
             <Section title="Risk Classification" badge="ESL Analysis">
               <div className="space-y-3">
                 <div className="flex justify-between items-center p-3 rounded-lg" style={{ background: risk.iec62304Class === 'C' ? '#fee2e2' : risk.iec62304Class === 'B' ? '#fef9c3' : '#dcfce7' }}>
-                  <span className="text-sm font-medium">IEC 62304 Class</span>
+                  <a href="https://www.parasoft.com/blog/what-is-iec-62304-how-is-it-used-in-medical-device-compliance/" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-blue-600 hover:underline">IEC 62304 Class</a>
                   <span className="text-lg font-bold">{risk.iec62304Class}</span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
@@ -174,11 +174,14 @@ export default function DeviceDetailPage() {
                   <span className="text-lg font-bold text-blue-700">{risk.fdaClass}</span>
                 </div>
                 <p className="text-xs text-gray-500">{risk.rationale}</p>
+                <a href="https://www.parasoft.com/blog/what-is-iec-62304-how-is-it-used-in-medical-device-compliance/" target="_blank" rel="noopener noreferrer" className="block text-xs text-blue-600 hover:underline mt-1">
+                  Learn how Parasoft automates IEC 62304 compliance testing →
+                </a>
               </div>
             </Section>
 
             {/* Cybersecurity Evidence */}
-            <Section title="Cybersecurity Evidence" badge="Powered by SBOMator™">
+            <Section title="Cybersecurity Evidence" badge={<a href="https://eswlab.com/products/esl-ailogiclabs/sbomator/" target="_blank" rel="noopener noreferrer" className="text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-600 font-medium hover:bg-blue-100">Powered by SBOMator™</a>}>
               {!pdfResult && (
                 <p className="text-xs text-gray-400 mb-3">Based on AI-generated device summaries, not the full FDA submission. Items not detected here may still be present in the complete submission package.</p>
               )}
@@ -283,8 +286,10 @@ export default function DeviceDetailPage() {
             <div className="bg-gradient-to-br from-blue-900 to-blue-700 rounded-2xl p-6 text-white">
               <h3 className="font-semibold mb-2">Preparing a similar submission?</h3>
               <p className="text-sm text-blue-100 mb-4">
-                ESL takes complete ownership of your software evidence work.
-                SBOM &amp; CVE remediation. Static analysis. Unit testing. Traceability.
+                ESL takes complete ownership of your software evidence work —
+                SBOM &amp; CVE remediation with <a href="https://eswlab.com/products/esl-ailogiclabs/sbomator/" target="_blank" rel="noopener noreferrer" className="text-white font-medium underline hover:text-blue-200">SBOMator™</a>,
+                static analysis &amp; unit testing with <a href="https://www.parasoft.com/blog/what-is-iec-62304-how-is-it-used-in-medical-device-compliance/" target="_blank" rel="noopener noreferrer" className="text-white font-medium underline hover:text-blue-200">Parasoft</a>,
+                traceability, and full IEC 62304 lifecycle support.
               </p>
               <a href="/assessment" className="block w-full text-center py-2.5 bg-white text-blue-800 font-semibold rounded-lg hover:bg-blue-50">
                 Assess Your Readiness →
@@ -309,12 +314,14 @@ function getRegulatoryPathway(sub: string): string {
   return 'Unknown';
 }
 
-function Section({ title, badge, children }: { title: string; badge?: string; children: React.ReactNode }) {
+function Section({ title, badge, children }: { title: string; badge?: React.ReactNode; children: React.ReactNode }) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-6">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
-        {badge && <span className="text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-600 font-medium">{badge}</span>}
+        {badge && (typeof badge === 'string'
+          ? <span className="text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-600 font-medium">{badge}</span>
+          : badge)}
       </div>
       {children}
     </div>
