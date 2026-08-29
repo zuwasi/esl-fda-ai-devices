@@ -84,19 +84,14 @@ Alternative (simpler): Add a "Last updated" date on the homepage and a manual re
 
 ---
 
-# 5. SEO & Discoverability (High Priority, Low Effort)
+# 5. SEO & Discoverability (High Priority, Low Effort) - Partially Done
 
-Problem: The platform has no SEO optimization. Search engines cannot index device detail pages because they are client-rendered.
+**Completed:** metadataBase, OpenGraph tags, Twitter cards, robots.txt, sitemap.ts (1,248 device URLs), manifest.ts all configured for `esl-fda.io`.
 
-Solution:
-- Add `metadata` exports to each page (title, description, Open Graph tags)
+**Remaining:**
 - Generate static metadata for each device detail page: "K240369 - Sleep Apnea Notification Feature (SANF) - FDA AI Device | ESL"
-- Add `robots.txt` and `sitemap.xml` with all device pages
 - Add structured data (JSON-LD) for each device: MedicalDevice schema with name, manufacturer, regulation, date
-- Add canonical URLs
-- This is critical: if people searching "FDA sleep apnea device" cannot find your page, the platform does not exist
-
-Effort: 2-4 hours. One of the highest ROI improvements.
+- Submit sitemap to Google Search Console and Bing Webmaster Tools
 
 ---
 
@@ -114,17 +109,14 @@ Effort: 1-2 hours for basic analytics. Half day for the contact form.
 
 ---
 
-# 7. Custom Domain & Email (Operational)
+# 7. Custom Domain (Done)
 
-Problem: The Railway URL (`esl-fda-ai-devices-production.up.railway.app`) is not memorable or professional for client-facing use.
+**Completed:** Domain `esl-fda.io` purchased via Railway Domains and connected to the production service. SSL auto-provisioned by Railway.
 
-Solution:
-- Register a domain like `fda-ai-devices.eswlab.com` (subdomain of existing ESL domain) or a dedicated domain like `fdaaidevices.com`
-- Configure the custom domain in Railway settings
-- Set up DNS (CNAME to Railway proxy)
-- This eliminates the awkward Railway URL in client communications
-
-Effort: 1 hour once the domain is decided.
+- SEO metadata (metadataBase, OpenGraph, Twitter cards) configured in layout.tsx
+- robots.txt and sitemap.ts (1,248 device pages + 5 static pages) generated
+- manifest.ts for PWA metadata
+- README.md and documentation updated to reference https://esl-fda.io
 
 ---
 
@@ -172,7 +164,7 @@ Priority Summary
 |---|--------|-------|------|-------|
 | 5 | SEO & Discoverability | High | Leg | High |
 | 6 | Analytics & Lead Tracking | High | Leg | High |
-| 7 | Custom Domain | High | Leg | Medium |
+| 7 | Custom Domain | Done | Done | Done |
 | 1 | AI Regulatory Concerns Summary | High | Medium | High |
 | 4 | Data Pipeline Automation | Medium | High | High |
 | 8 | Data Export & PDF Reports | Medium | Medium | Medium |
