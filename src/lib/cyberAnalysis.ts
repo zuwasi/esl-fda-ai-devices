@@ -2,9 +2,11 @@ import type { CyberEvidence, DeviceRecord } from './types';
 
 const SBOM_INDICATORS = [
   'sbom', 'software bill of materials', 'component list',
-  'third-party software', 'open source', 'open-source',
+  'third-party software', 'third-party component', 'open source', 'open-source',
   'software composition', 'dependency', 'library list',
-  'cyclonedx', 'spdx'
+  'cyclonedx', 'spdx',
+  'software component', 'software version', 'software package',
+  'software library', 'libraries',
 ];
 
 const CYBER_RISK_INDICATORS = [
@@ -12,13 +14,21 @@ const CYBER_RISK_INDICATORS = [
   'vulnerability', 'threat model', 'security assessment',
   'penetration test', 'security testing', 'cryptographic',
   'encryption', 'authentication', 'access control',
-  'data protection', 'hipaa', 'privacy'
+  'data protection', 'hipaa', 'privacy',
+  'cyber', 'security', 'system security', 'data security',
+  'network security', 'security mechanism', 'security feature',
+  'password', 'biometric', 'de-identification', 'deidentification',
+  'anonymiz', 'pseudonym', 'decrypt', 'firewall', 'antivirus',
+  'malware', 'ransomware', 'TLS', 'SSL', 'VPN', 'AES',
 ];
 
 const POSTMARKET_INDICATORS = [
   'postmarket', 'post-market', 'postmarket surveillance',
   'monitoring plan', 'update plan', 'patch management',
-  'maintenance plan', 'cybersecurity postmarket'
+  'maintenance plan', 'cybersecurity postmarket',
+  'post approval', 'post-approval', 'monitoring',
+  'surveillance', 'software update', 'real-world',
+  'real world', 'ongoing monitoring',
 ];
 
 function checkIndicators(text: string, indicators: string[]): boolean {
