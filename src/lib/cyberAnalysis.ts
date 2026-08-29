@@ -52,17 +52,22 @@ export function analyzeCyberEvidence(record: DeviceRecord): CyberEvidence {
   if (section524BApplicable && hasSBOM && hasCyberRiskAssessment) score += 15;
 
   const findings: string[] = [];
-  if (section524BApplicable && !hasSBOM) {
-    findings.push('SBOM evidence not detected in summary \u2014 required under \u00a7524B for cyber devices');
-  }
-  if (section524BApplicable && !hasCyberRiskAssessment) {
-    findings.push('Cybersecurity risk assessment not explicitly referenced \u2014 expected per FDA 2026 guidance');
-  }
-  if (!hasPostmarketPlan) {
-    findings.push('Postmarket cybersecurity monitoring plan not clearly documented');
-  }
   if (hasSBOM && hasCyberRiskAssessment && hasPostmarketPlan) {
-    findings.push('Comprehensive cybersecurity evidence package detected in submission summary');
+    findings.push('Comprehensive cybersecurity evidence detected in submission summary');
+  } else {
+    findings.push('Analysis is based on the AI-generated device summary, not the full FDA submission package. Evidence may be present in the complete submission even if not reflected here.');
+    if (section524BApplicable && !hasSBOM) {
+      findings.push('SBOM not mentioned in summary. Under \u00a7524B (effective Oct 2023), cyber devices must provide a SBOM \u2014 it is likely included in the full submission but not in this condensed summary.');
+    }
+    if (section524BApplicable && !hasCyberRiskAssessment) {
+      findings.push('Cybersecurity risk assessment not referenced in summary. FDA cybersecurity guidance (2023) expects this for cyber devices \u2014 likely present in the actual submission documentation.');
+    }
+    if (!section524BApplicable && (!hasSBOM || !hasCyberRiskAssessment)) {
+      findings.push('This device was authorized before \u00a7524B took effect. Cybersecurity evidence requirements were less prescriptive at the time.');
+    }
+    if (!hasPostmarketPlan) {
+      findings.push('Postmarket cybersecurity monitoring plan not clearly documented in summary.');
+    }
   }
 
   return {
@@ -79,12 +84,12 @@ export function getCyberScoreLabel(score: number): string {
   if (score >= 80) return 'Strong';
   if (score >= 50) return 'Moderate';
   if (score >= 25) return 'Limited';
-  return 'Not Evidenced';
+  return 'Not Detected in Summary';
 }
 
 export function getCyberScoreColor(score: number): string {
   if (score >= 80) return '#16a34a';
   if (score >= 50) return '#eab308';
   if (score >= 25) return '#f97316';
-  return '#dc2626';
+  return '#6b7280';
 }

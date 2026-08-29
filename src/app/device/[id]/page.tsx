@@ -149,19 +149,20 @@ export default function DeviceDetailPage() {
 
             {/* Cybersecurity Evidence */}
             <Section title="Cybersecurity Evidence" badge="Powered by SBOMator™">
+              <p className="text-xs text-gray-400 mb-3">Based on AI-generated device summaries, not the full FDA submission. Items not detected here may still be present in the complete submission package.</p>
               <div className="space-y-3">
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-sm font-medium">Cyber Score</span>
-                  <span className="text-lg font-bold" style={{ color: cyber.cyberScore >= 80 ? '#16a34a' : cyber.cyberScore >= 50 ? '#eab308' : cyber.cyberScore >= 25 ? '#f97316' : '#dc2626' }}>
+                  <span className="text-lg font-bold" style={{ color: cyber.cyberScore >= 80 ? '#16a34a' : cyber.cyberScore >= 50 ? '#eab308' : cyber.cyberScore >= 25 ? '#f97316' : '#6b7280' }}>
                     {cyber.cyberScore}/100
                   </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="h-2 rounded-full transition-all" style={{ width: cyber.cyberScore + '%', background: cyber.cyberScore >= 80 ? '#16a34a' : cyber.cyberScore >= 50 ? '#eab308' : cyber.cyberScore >= 25 ? '#f97316' : '#dc2626' }} />
+                  <div className="h-2 rounded-full transition-all" style={{ width: cyber.cyberScore + '%', background: cyber.cyberScore >= 80 ? '#16a34a' : cyber.cyberScore >= 50 ? '#eab308' : cyber.cyberScore >= 25 ? '#f97316' : '#6b7280' }} />
                 </div>
-                <CyberRow label="SBOM Evidence" found={cyber.hasSBOM} />
-                <CyberRow label="Cyber Risk Assessment" found={cyber.hasCyberRiskAssessment} />
-                <CyberRow label="Postmarket Plan" found={cyber.hasPostmarketPlan} />
+                <CyberRow label="SBOM Evidence" found={cyber.hasSBOM} section524B={cyber.section524BApplicable} />
+                <CyberRow label="Cyber Risk Assessment" found={cyber.hasCyberRiskAssessment} section524B={cyber.section524BApplicable} />
+                <CyberRow label="Postmarket Plan" found={cyber.hasPostmarketPlan} section524B={cyber.section524BApplicable} />
                 <CyberRow label="§524B Applicable" found={cyber.section524BApplicable} neutral={true} />
                 {cyber.findings.length > 0 && (
                   <div className="mt-3 p-3 bg-gray-50 rounded-lg">
@@ -223,7 +224,7 @@ function MetaItem({ label, value }: { label: string; value?: string }) {
   );
 }
 
-function CyberRow({ label, found, neutral }: { label: string; found: boolean; neutral?: boolean }) {
+function CyberRow({ label, found, neutral, section524B }: { label: string; found: boolean; neutral?: boolean; section524B?: boolean }) {
   if (neutral) {
     return (
       <div className="flex items-center justify-between text-sm">
@@ -232,10 +233,24 @@ function CyberRow({ label, found, neutral }: { label: string; found: boolean; ne
       </div>
     );
   }
+  if (found) {
+    return (
+      <div className="flex items-center justify-between text-sm">
+        <span className="text-gray-600">{label}</span>
+        <span className="text-green-600 font-medium">✓ Detected in Summary</span>
+      </div>
+    );
+  }
+  // Not found in summary — show nuanced status
+  const hint = section524B
+    ? 'Not in summary — likely in full submission per §524B'
+    : 'Not mentioned in summary';
   return (
-    <div className="flex items-center justify-between text-sm">
-      <span className="text-gray-600">{label}</span>
-      {found ? <span className="text-green-600 font-medium">✓ Detected</span> : <span className="text-red-500 font-medium">✗ Not Evidenced</span>}
+    <div className="flex flex-col gap-0.5 text-sm">
+      <div className="flex items-center justify-between">
+        <span className="text-gray-600">{label}</span>
+        <span className="text-gray-500 font-medium">⚠ {hint}</span>
+      </div>
     </div>
   );
 }
