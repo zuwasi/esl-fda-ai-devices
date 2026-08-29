@@ -42,6 +42,14 @@ export interface SearchResult {
   cyberDeviceStatus: string;
 }
 
+export interface XBomEvidence {
+  type: string;
+  fullName: string;
+  description: string;
+  detected: boolean;
+  indicators: string[];
+}
+
 export interface CyberEvidence {
   hasSBOM: boolean;
   hasCyberRiskAssessment: boolean;
@@ -52,6 +60,7 @@ export interface CyberEvidence {
   analysisSource?: 'summary' | 'pdf';
   pdfTextLength?: number;
   snippets?: string[];
+  xbom?: XBomEvidence[];
 }
 
 export interface EvidenceRequirement {

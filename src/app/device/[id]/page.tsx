@@ -206,6 +206,29 @@ export default function DeviceDetailPage() {
                       <CyberRow label="Cyber Risk Assessment" found={activeCyber.hasCyberRiskAssessment} section524B={activeCyber.section524BApplicable} pdfMode={!!pdfResult} />
                       <CyberRow label="Postmarket Plan" found={activeCyber.hasPostmarketPlan} section524B={activeCyber.section524BApplicable} pdfMode={!!pdfResult} />
                       <CyberRow label="§524B Applicable" found={activeCyber.section524BApplicable} neutral={true} />
+                      {/* xBOM Supply Chain Evidence (CycloneDX / OWASP ECMA-424) */}
+                      {activeCyber.xbom && activeCyber.xbom.length > 0 && (
+                        <div className="mt-4 pt-3 border-t border-gray-100">
+                          <p className="text-xs font-semibold text-gray-700 mb-2">Supply Chain BOM Evidence</p>
+                          <p className="text-xs text-gray-400 mb-3">Based on the CycloneDX / OWASP ECMA-424 xBOM ecosystem. Detection is from the {pdfResult ? 'full FDA PDF' : 'AI-generated summary'}.</p>
+                          <div className="space-y-2">
+                            {activeCyber.xbom.map((x, i) => (
+                              <div key={i} className="flex items-start justify-between gap-2 text-xs">
+                                <div className="flex-1">
+                                  <span className={'font-medium ' + (x.detected ? 'text-gray-700' : 'text-gray-400')}>{x.type}</span>
+                                  <span className="text-gray-400 ml-1">{x.fullName}</span>
+                                  {x.detected && x.indicators.length > 0 && (
+                                    <span className="text-gray-400 ml-1">({x.indicators.join(', ')})</span>
+                                  )}
+                                </div>
+                                <span className={x.detected ? 'text-green-600 font-medium' : 'text-gray-400'}>
+                                  {x.detected ? '✓ Detected' : '— Not detected'}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                       {activeCyber.findings.length > 0 && (
                         <div className="mt-3 p-3 bg-gray-50 rounded-lg">
                           <p className="text-xs font-medium text-gray-700 mb-2">Analysis:</p>
