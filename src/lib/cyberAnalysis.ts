@@ -34,6 +34,11 @@ export function analyzeCyberEvidence(record: DeviceRecord): CyberEvidence {
     record.concepts || '',
     record.generated_questions || '',
   ].join(' ');
+  return analyzeCyberEvidenceFromText(record, fullText);
+}
+
+export function analyzeCyberEvidenceFromText(record: DeviceRecord, text: string): CyberEvidence {
+  const fullText = text;
 
   const decisionDate = record.date_of_final_decision || '';
   const dateObj = new Date(decisionDate);
@@ -52,21 +57,28 @@ export function analyzeCyberEvidence(record: DeviceRecord): CyberEvidence {
   if (section524BApplicable && hasSBOM && hasCyberRiskAssessment) score += 15;
 
   const findings: string[] = [];
+  const sourceLabel = text === [
+    record.summary || '', record.thesis || '', record.summary_keywords || '',
+    record.concepts || '', record.generated_questions || '',
+  ].join(' ') ? 'AI-generated device summary' : 'full FDA Summary PDF';
+
   if (hasSBOM && hasCyberRiskAssessment && hasPostmarketPlan) {
-    findings.push('Comprehensive cybersecurity evidence detected in submission summary');
+    findings.push('Comprehensive cybersecurity evidence detected in ' + sourceLabel);
   } else {
-    findings.push('Analysis is based on the AI-generated device summary, not the full FDA submission package. Evidence may be present in the complete submission even if not reflected here.');
+    if (sourceLabel === 'AI-generated device summary') {
+      findings.push('Analysis is based on the AI-generated device summary, not the full FDA submission package. Click "Analyze Full FDA PDF" below to scan the actual submission document.');
+    }
     if (section524BApplicable && !hasSBOM) {
-      findings.push('SBOM not mentioned in summary. Under \u00a7524B (effective Oct 2023), cyber devices must provide a SBOM \u2014 it is likely included in the full submission but not in this condensed summary.');
+      findings.push('SBOM not mentioned in ' + sourceLabel + '. Under \u00a7524B (effective Oct 2023), cyber devices must provide a SBOM.');
     }
     if (section524BApplicable && !hasCyberRiskAssessment) {
-      findings.push('Cybersecurity risk assessment not referenced in summary. FDA cybersecurity guidance (2023) expects this for cyber devices \u2014 likely present in the actual submission documentation.');
+      findings.push('Cybersecurity risk assessment not referenced in ' + sourceLabel + '. FDA cybersecurity guidance (2023) expects this for cyber devices.');
     }
     if (!section524BApplicable && (!hasSBOM || !hasCyberRiskAssessment)) {
       findings.push('This device was authorized before \u00a7524B took effect. Cybersecurity evidence requirements were less prescriptive at the time.');
     }
     if (!hasPostmarketPlan) {
-      findings.push('Postmarket cybersecurity monitoring plan not clearly documented in summary.');
+      findings.push('Postmarket cybersecurity monitoring plan not clearly documented in ' + sourceLabel + '.');
     }
   }
 

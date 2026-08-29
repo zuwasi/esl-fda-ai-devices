@@ -15,6 +15,11 @@ export default function DeviceDetailPage() {
   } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [pdfAnalyzing, setPdfAnalyzing] = useState(false);
+  const [pdfResult, setPdfResult] = useState<{
+    cyber: CyberEvidence; pdfTextLength: number; snippets: string[]; warning?: string;
+  } | null>(null);
+  const [pdfError, setPdfError] = useState('');
 
   useEffect(() => {
     fetch('/api/search?id=' + encodeURIComponent(id))
@@ -23,6 +28,31 @@ export default function DeviceDetailPage() {
       .catch(e => setError(e.message))
       .finally(() => setLoading(false));
   }, [id]);
+
+  async function analyzePdf() {
+    if (!data?.record.summary_pdf_link) return;
+    setPdfAnalyzing(true);
+    setPdfError('');
+    setPdfResult(null);
+    try {
+      const res = await fetch('/api/pdf-analysis?id=' + encodeURIComponent(id));
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Analysis failed');
+      }
+      const d = await res.json();
+      setPdfResult({
+        cyber: d.cyber,
+        pdfTextLength: d.pdfTextLength || 0,
+        snippets: d.snippets || [],
+        warning: d.warning,
+      });
+    } catch (e) {
+      setPdfError(e instanceof Error ? e.message : 'Analysis failed');
+    } finally {
+      setPdfAnalyzing(false);
+    }
+  }
 
   if (loading) return (
     <div><Header /><main className="max-w-4xl mx-auto py-20 px-4">
@@ -149,26 +179,79 @@ export default function DeviceDetailPage() {
 
             {/* Cybersecurity Evidence */}
             <Section title="Cybersecurity Evidence" badge="Powered by SBOMator™">
-              <p className="text-xs text-gray-400 mb-3">Based on AI-generated device summaries, not the full FDA submission. Items not detected here may still be present in the complete submission package.</p>
+              {!pdfResult && (
+                <p className="text-xs text-gray-400 mb-3">Based on AI-generated device summaries, not the full FDA submission. Items not detected here may still be present in the complete submission package.</p>
+              )}
               <div className="space-y-3">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm font-medium">Cyber Score</span>
-                  <span className="text-lg font-bold" style={{ color: cyber.cyberScore >= 80 ? '#16a34a' : cyber.cyberScore >= 50 ? '#eab308' : cyber.cyberScore >= 25 ? '#f97316' : '#6b7280' }}>
-                    {cyber.cyberScore}/100
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="h-2 rounded-full transition-all" style={{ width: cyber.cyberScore + '%', background: cyber.cyberScore >= 80 ? '#16a34a' : cyber.cyberScore >= 50 ? '#eab308' : cyber.cyberScore >= 25 ? '#f97316' : '#6b7280' }} />
-                </div>
-                <CyberRow label="SBOM Evidence" found={cyber.hasSBOM} section524B={cyber.section524BApplicable} />
-                <CyberRow label="Cyber Risk Assessment" found={cyber.hasCyberRiskAssessment} section524B={cyber.section524BApplicable} />
-                <CyberRow label="Postmarket Plan" found={cyber.hasPostmarketPlan} section524B={cyber.section524BApplicable} />
-                <CyberRow label="§524B Applicable" found={cyber.section524BApplicable} neutral={true} />
-                {cyber.findings.length > 0 && (
+                {/* Show PDF analysis results if available, otherwise show summary-based results */}
+                {(() => {
+                  const activeCyber = pdfResult ? pdfResult.cyber : cyber;
+                  return (
+                    <>
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-sm font-medium">Cyber Score</span>
+                        <span className="text-lg font-bold" style={{ color: activeCyber.cyberScore >= 80 ? '#16a34a' : activeCyber.cyberScore >= 50 ? '#eab308' : activeCyber.cyberScore >= 25 ? '#f97316' : '#6b7280' }}>
+                          {activeCyber.cyberScore}/100
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div className="h-2 rounded-full transition-all" style={{ width: activeCyber.cyberScore + '%', background: activeCyber.cyberScore >= 80 ? '#16a34a' : activeCyber.cyberScore >= 50 ? '#eab308' : activeCyber.cyberScore >= 25 ? '#f97316' : '#6b7280' }} />
+                      </div>
+                      {pdfResult && (
+                        <div className="text-xs font-medium text-blue-700 bg-blue-50 rounded-lg px-3 py-2">
+                          ✓ Analyzed {pdfResult.pdfTextLength.toLocaleString()} characters from the full FDA Summary PDF
+                        </div>
+                      )}
+                      <CyberRow label="SBOM Evidence" found={activeCyber.hasSBOM} section524B={activeCyber.section524BApplicable} pdfMode={!!pdfResult} />
+                      <CyberRow label="Cyber Risk Assessment" found={activeCyber.hasCyberRiskAssessment} section524B={activeCyber.section524BApplicable} pdfMode={!!pdfResult} />
+                      <CyberRow label="Postmarket Plan" found={activeCyber.hasPostmarketPlan} section524B={activeCyber.section524BApplicable} pdfMode={!!pdfResult} />
+                      <CyberRow label="§524B Applicable" found={activeCyber.section524BApplicable} neutral={true} />
+                      {activeCyber.findings.length > 0 && (
+                        <div className="mt-3 p-3 bg-gray-50 rounded-lg">
+                          <p className="text-xs font-medium text-gray-700 mb-2">Analysis:</p>
+                          {activeCyber.findings.map((f, i) => <p key={i} className="text-xs text-gray-600 mb-1">• {f}</p>)}
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
+                {/* PDF evidence snippets */}
+                {pdfResult && pdfResult.snippets.length > 0 && (
                   <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-                    <p className="text-xs font-medium text-gray-700 mb-2">Analysis:</p>
-                    {cyber.findings.map((f, i) => <p key={i} className="text-xs text-gray-600 mb-1">• {f}</p>)}
+                    <p className="text-xs font-medium text-gray-700 mb-2">Evidence snippets from FDA PDF:</p>
+                    {pdfResult.snippets.map((s, i) => <p key={i} className="text-xs text-gray-500 mb-2 italic">{s}</p>)}
                   </div>
+                )}
+                {pdfResult && pdfResult.warning && (
+                  <p className="text-xs text-amber-600">{pdfResult.warning}</p>
+                )}
+                {/* Analyze Full FDA PDF button */}
+                {r.summary_pdf_link && !pdfResult && (
+                  <button
+                    onClick={analyzePdf}
+                    disabled={pdfAnalyzing}
+                    className="w-full py-2.5 text-sm font-semibold text-blue-700 border border-blue-200 rounded-lg hover:bg-blue-50 disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {pdfAnalyzing ? (
+                      <>
+                        <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+                        Fetching & analyzing FDA PDF...
+                      </>
+                    ) : (
+                      <>📄 Analyze Full FDA PDF</>
+                    )}
+                  </button>
+                )}
+                {pdfError && (
+                  <p className="text-xs text-red-500">PDF analysis failed: {pdfError}</p>
+                )}
+                {pdfResult && (
+                  <button
+                    onClick={() => setPdfResult(null)}
+                    className="w-full py-2 text-xs text-gray-500 hover:text-gray-700"
+                  >
+                    ← Back to summary-based analysis
+                  </button>
                 )}
               </div>
             </Section>
@@ -224,7 +307,7 @@ function MetaItem({ label, value }: { label: string; value?: string }) {
   );
 }
 
-function CyberRow({ label, found, neutral, section524B }: { label: string; found: boolean; neutral?: boolean; section524B?: boolean }) {
+function CyberRow({ label, found, neutral, section524B, pdfMode }: { label: string; found: boolean; neutral?: boolean; section524B?: boolean; pdfMode?: boolean }) {
   if (neutral) {
     return (
       <div className="flex items-center justify-between text-sm">
@@ -237,19 +320,19 @@ function CyberRow({ label, found, neutral, section524B }: { label: string; found
     return (
       <div className="flex items-center justify-between text-sm">
         <span className="text-gray-600">{label}</span>
-        <span className="text-green-600 font-medium">✓ Detected in Summary</span>
+        <span className="text-green-600 font-medium">{pdfMode ? '✓ Found in FDA PDF' : '✓ Detected in Summary'}</span>
       </div>
     );
   }
-  // Not found in summary — show nuanced status
-  const hint = section524B
-    ? 'Not in summary — likely in full submission per §524B'
-    : 'Not mentioned in summary';
+  // Not found
+  const hint = pdfMode
+    ? (section524B ? 'Not found in full FDA PDF' : 'Not mentioned in FDA PDF')
+    : (section524B ? 'Not in summary — likely in full submission per §524B' : 'Not mentioned in summary');
   return (
     <div className="flex flex-col gap-0.5 text-sm">
       <div className="flex items-center justify-between">
         <span className="text-gray-600">{label}</span>
-        <span className="text-gray-500 font-medium">⚠ {hint}</span>
+        <span className={'font-medium ' + (pdfMode ? 'text-red-500' : 'text-gray-500')}>{pdfMode ? '✗ ' : '⚠ '}{hint}</span>
       </div>
     </div>
   );

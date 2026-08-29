@@ -49,6 +49,9 @@ export interface CyberEvidence {
   section524BApplicable: boolean;
   cyberScore: number;
   findings: string[];
+  analysisSource?: 'summary' | 'pdf';
+  pdfTextLength?: number;
+  snippets?: string[];
 }
 
 export interface EvidenceRequirement {
