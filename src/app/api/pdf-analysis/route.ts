@@ -68,8 +68,8 @@ export async function GET(req: Request) {
     const records = await loadRecords();
     const record = records[id];
     if (!record) return NextResponse.json({ error: 'Device not found' }, { status: 404 });
-    if (!record.summary_pdf_link) {
-      return NextResponse.json({ error: 'No PDF link available for this device' }, { status: 404 });
+    if (!record.summary_pdf_link || !record.summary_pdf_link.startsWith('http')) {
+      return NextResponse.json({ error: 'No valid FDA Summary PDF available for this device' }, { status: 404 });
     }
 
     const pdfText = await fetchPdfText(record.summary_pdf_link);

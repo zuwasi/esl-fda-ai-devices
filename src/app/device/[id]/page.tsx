@@ -30,7 +30,7 @@ export default function DeviceDetailPage() {
   }, [id]);
 
   async function analyzePdf() {
-    if (!data?.record.summary_pdf_link) return;
+    if (!data?.record?.summary_pdf_link?.startsWith('http')) return;
     setPdfAnalyzing(true);
     setPdfError('');
     setPdfResult(null);
@@ -226,7 +226,7 @@ export default function DeviceDetailPage() {
                   <p className="text-xs text-amber-600">{pdfResult.warning}</p>
                 )}
                 {/* Analyze Full FDA PDF button */}
-                {r.summary_pdf_link && !pdfResult && (
+                {r.summary_pdf_link && r.summary_pdf_link.startsWith('http') && !pdfResult && (
                   <button
                     onClick={analyzePdf}
                     disabled={pdfAnalyzing}
