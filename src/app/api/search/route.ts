@@ -171,20 +171,67 @@ interface Filters {
   company?: string;
   pathway?: string;
   dataType?: string;
+  productCode?: string;
+  aiFunction?: string;
+  deviceClass?: string;
+  cyberDevice?: string;
   yearFrom?: string;
   yearTo?: string;
+}
+
+async function resolveProductCodeSubmissions(productCode?: string): Promise<Set<string> | undefined> {
+  const code = productCode?.trim().toUpperCase();
+  if (!code) return undefined;
+  if (!/^[A-Z0-9]{3}$/.test(code)) return new Set();
+
+  const search = encodeURIComponent(`product_code:"${code}"`);
+  const urls = [
+    `https://api.fda.gov/device/510k.json?search=${search}&count=k_number.exact&limit=1000`,
+    `https://api.fda.gov/device/pma.json?search=${search}&count=pma_number.exact&limit=1000`,
+    `https://api.fda.gov/device/classification.json?search=${search}&limit=100`,
+  ];
+  const responses = await Promise.all(urls.map(async url => {
+    try {
+      const response = await fetch(url, { next: { revalidate: 86400 } });
+      if (!response.ok) return [];
+      const data = await response.json();
+      return data.results || [];
+    } catch {
+      return [];
+    }
+  }));
+
+  const submissions = new Set<string>();
+  for (const result of responses.flat()) {
+    if (result.term) submissions.add(result.term);
+    if (result.k_number) submissions.add(result.k_number);
+    if (result.pma_number) submissions.add(result.pma_number);
+    for (const number of result.openfda?.k_number || []) submissions.add(number);
+  }
+  return submissions;
 }
 
 function applyFilters(
   id: string,
   records: Record<string, DeviceRecord>,
-  filters: Filters
+  filters: Filters,
+  productCodeSubmissions?: Set<string>
 ): boolean {
   const r = records[id];
   if (!r) return false;
   if (filters.panel && filters.panel !== 'all' && (r.panel_lead || r.lead_panel) !== filters.panel) return false;
   if (filters.company && filters.company !== 'all' && r.company !== filters.company) return false;
   if (filters.dataType && filters.dataType !== 'all' && r.data_type !== filters.dataType) return false;
+  if (filters.aiFunction && filters.aiFunction !== 'all' && r.ai_function !== filters.aiFunction) return false;
+  if (filters.productCode) {
+    const localMatch = r.primary_product_code?.toUpperCase() === filters.productCode.trim().toUpperCase();
+    if (!localMatch && !productCodeSubmissions?.has(id)) return false;
+  }
+  if (filters.deviceClass && filters.deviceClass !== 'all' && classifyRisk(r).fdaClass !== filters.deviceClass) return false;
+  if (filters.cyberDevice && filters.cyberDevice !== 'all') {
+    const expected = filters.cyberDevice === 'Likely applicable';
+    if (classifyRisk(r).cyberDevice !== expected) return false;
+  }
   if (filters.pathway && filters.pathway !== 'all') {
     const pathway = getRegulatoryPathway(r.submission_number);
     if (pathway !== filters.pathway) return false;
@@ -223,7 +270,7 @@ function formatResult(id: string, score: number, records: Record<string, DeviceR
 async function performEmbeddingSearch(
   query: string, topK: number, weights: Record<string, number>,
   shards: Record<string, ShardDoc[]>, records: Record<string, DeviceRecord>,
-  filters: Filters
+  filters: Filters, productCodeSubmissions?: Set<string>
 ) {
   const qv = await embedText(query);
   const docScores: Record<string, { [k: string]: number }> = {};
@@ -242,7 +289,7 @@ async function performEmbeddingSearch(
       for (const sn in scores) hs += (scores[sn] || 0) * (weights[sn] || 0);
       return { id, score: hs };
     })
-    .filter(r => applyFilters(r.id, records, filters))
+    .filter(r => applyFilters(r.id, records, filters, productCodeSubmissions))
     .sort((a, b) => b.score - a.score)
     .slice(0, topK);
   return ranked.map(r => formatResult(r.id, r.score, records));
@@ -250,7 +297,8 @@ async function performEmbeddingSearch(
 
 function performKeywordSearch(
   query: string, page: number, limit: number,
-  records: Record<string, DeviceRecord>, filters: Filters
+  records: Record<string, DeviceRecord>, filters: Filters,
+  productCodeSubmissions?: Set<string>
 ) {
   let arr = Object.entries(records).map(([id, r]) => ({ id, record: r }));
   if (query) {
@@ -267,26 +315,7 @@ function performKeywordSearch(
       return terms.every(t => text.includes(t));
     });
   }
-  if (filters.panel && filters.panel !== 'all') {
-    arr = arr.filter(({ record }) => (record.panel_lead || record.lead_panel) === filters.panel);
-  }
-  if (filters.company && filters.company !== 'all') {
-    arr = arr.filter(({ record }) => record.company === filters.company);
-  }
-  if (filters.dataType && filters.dataType !== 'all') {
-    arr = arr.filter(({ record }) => record.data_type === filters.dataType);
-  }
-  if (filters.pathway && filters.pathway !== 'all') {
-    arr = arr.filter(({ id }) => getRegulatoryPathway(id) === filters.pathway);
-  }
-  if (filters.yearFrom || filters.yearTo) {
-    arr = arr.filter(({ record }) => {
-      const year = parseInt((record.date_of_final_decision || '').split('/').pop() || '0');
-      if (filters.yearFrom && year < parseInt(filters.yearFrom)) return false;
-      if (filters.yearTo && year > parseInt(filters.yearTo)) return false;
-      return true;
-    });
-  }
+  arr = arr.filter(({ id }) => applyFilters(id, records, filters, productCodeSubmissions));
   const total = arr.length;
   const totalPages = Math.ceil(total / limit);
   const start = (page - 1) * limit;
@@ -309,17 +338,18 @@ export async function POST(req: Request) {
       mode = 'embedding', page = 1, limit = 20, lambdaVal = 0.8,
       filters = {} as Filters,
     } = body;
+    const productCodeSubmissions = await resolveProductCodeSubmissions(filters.productCode);
 
     if (mode === 'embedding') {
       if (!query) return NextResponse.json({ error: 'Query required.' }, { status: 400 });
-      const results = await performEmbeddingSearch(query, topK, weights, shards, records, filters);
+      const results = await performEmbeddingSearch(query, topK, weights, shards, records, filters, productCodeSubmissions);
       return NextResponse.json(results);
     } else if (mode === 'keyword') {
-      const results = performKeywordSearch(query, page, limit, records, filters);
+      const results = performKeywordSearch(query, page, limit, records, filters, productCodeSubmissions);
       return NextResponse.json(results);
     } else if (mode === 'hybrid') {
       if (!query) return NextResponse.json({ error: 'Query required.' }, { status: 400 });
-      const embResults = await performEmbeddingSearch(query, Math.max(topK * 3, 100), weights, shards, records, filters);
+      const embResults = await performEmbeddingSearch(query, Math.max(topK * 3, 100), weights, shards, records, filters, productCodeSubmissions);
       const embScores: Record<string, number> = {};
       for (const r of embResults) embScores[r.submissionNumber] = r.similarity;
       const bm25 = await buildBM25Index(records);
@@ -330,7 +360,7 @@ export async function POST(req: Request) {
       const nb = normalizeScores(bm25Scores);
       const combined: Record<string, number> = {};
       for (const id of new Set([...Object.keys(ne), ...Object.keys(nb)])) {
-        if (!applyFilters(id, records, filters)) continue;
+        if (!applyFilters(id, records, filters, productCodeSubmissions)) continue;
         combined[id] = lambdaVal * (ne[id] || 0) + (1 - lambdaVal) * (nb[id] || 0);
       }
       const sorted = Object.entries(combined).sort(([, a], [, b]) => b - a).slice(0, topK);
@@ -359,16 +389,19 @@ export async function GET(req: Request) {
     const panels = new Set<string>();
     const companies = new Set<string>();
     const dataTypes = new Set<string>();
+    const aiFunctions = new Set<string>();
     for (const r of Object.values(records)) {
       if (r.panel_lead) panels.add(r.panel_lead);
       if (r.company) companies.add(r.company);
       if (r.data_type) dataTypes.add(r.data_type);
+      if (r.ai_function) aiFunctions.add(r.ai_function);
     }
     return NextResponse.json({
       totalDevices: Object.keys(records).length,
       panels: Array.from(panels).sort(),
       companies: Array.from(companies).sort(),
       dataTypes: Array.from(dataTypes).sort(),
+      aiFunctions: Array.from(aiFunctions).sort(),
     });
   } catch (error) {
     return NextResponse.json({ error: 'Internal server error.' }, { status: 500 });

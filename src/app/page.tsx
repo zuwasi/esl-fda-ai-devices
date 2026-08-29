@@ -11,28 +11,35 @@ export default function Home() {
   const [results, setResults] = useState<any[]>([]);
   const [searched, setSearched] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
-  const [filterData, setFilterData] = useState<{panels:string[], companies:string[], dataTypes:string[]}>({panels:[],companies:[],dataTypes:[]});
+  const [filterData, setFilterData] = useState<{panels:string[], companies:string[], dataTypes:string[], aiFunctions:string[]}>({panels:[],companies:[],dataTypes:[],aiFunctions:[]});
+  const [filters, setFilters] = useState({
+    panel: 'all', company: 'all', pathway: 'all', dataType: 'all', productCode: '',
+    aiFunction: 'all', deviceClass: 'all', cyberDevice: 'all', yearFrom: '', yearTo: ''
+  });
+
+  const hasActiveFilters = Object.values(filters).some(value => value !== '' && value !== 'all');
 
   useEffect(() => {
     fetch('/api/search').then(r => r.json()).then(d => {
       setTotalCount(d.totalDevices || 0);
-      setFilterData({ panels: d.panels || [], companies: d.companies || [], dataTypes: d.dataTypes || [] });
+      setFilterData({ panels: d.panels || [], companies: d.companies || [], dataTypes: d.dataTypes || [], aiFunctions: d.aiFunctions || [] });
     }).catch(() => {});
   }, []);
 
   async function handleSearch(e: React.FormEvent) {
     e.preventDefault();
-    if (!query.trim()) return;
+    if (!query.trim() && !hasActiveFilters) return;
     setLoading(true);
     setSearched(true);
     try {
+      const searchMode = query.trim() ? mode : 'keyword';
       const res = await fetch('/api/search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: query.trim(), mode, topK: 50, page: 1, limit: 50 }),
+        body: JSON.stringify({ query: query.trim(), mode: searchMode, filters, topK: 50, page: 1, limit: 50 }),
       });
       const data = await res.json();
-      if (mode === 'keyword' && !Array.isArray(data)) {
+      if (searchMode === 'keyword' && !Array.isArray(data)) {
         setResults(data.results || []);
         setTotalCount(data.totalRecords || 0);
       } else {
@@ -85,7 +92,7 @@ export default function Home() {
                 />
                 <button
                   type="submit"
-                  disabled={loading || !query.trim()}
+                  disabled={loading || (!query.trim() && !hasActiveFilters)}
                   className="px-8 py-4 text-white font-semibold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   style={{ background: 'linear-gradient(135deg, #0b4c8a, #1a6cb0)' }}
                 >
@@ -106,6 +113,64 @@ export default function Home() {
                   <input type="radio" name="mode" value="keyword" checked={mode === 'keyword'} onChange={() => setMode('keyword')} className="accent-blue-600" />
                   Keyword Search
                 </label>
+              </div>
+              <div className="border-t border-gray-200 pt-4">
+                <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+                  <h2 className="text-sm font-semibold text-gray-800">Filter FDA-authorized devices</h2>
+                  {hasActiveFilters && (
+                    <button
+                      type="button"
+                      onClick={() => setFilters({ panel: 'all', company: 'all', pathway: 'all', dataType: 'all', productCode: '', aiFunction: 'all', deviceClass: 'all', cyberDevice: 'all', yearFrom: '', yearTo: '' })}
+                      className="text-sm text-blue-600 hover:underline"
+                    >
+                      Clear filters
+                    </button>
+                  )}
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                  <HomeFilterSelect label="Regulatory Pathway" value={filters.pathway} options={['510(k)', 'De Novo', 'PMA']} onChange={value => setFilters(prev => ({ ...prev, pathway: value }))} />
+                  <HomeFilterSelect label="Clinical Panel" value={filters.panel} options={filterData.panels} onChange={value => setFilters(prev => ({ ...prev, panel: value }))} />
+                  <HomeFilterSelect label="Company" value={filters.company} options={filterData.companies} onChange={value => setFilters(prev => ({ ...prev, company: value }))} />
+                  <HomeFilterSelect label="Data Type" value={filters.dataType} options={filterData.dataTypes} onChange={value => setFilters(prev => ({ ...prev, dataType: value }))} />
+                  <label className="block">
+                    <span className="block text-xs font-medium text-gray-600 mb-1">FDA Product Code</span>
+                    <input
+                      type="text"
+                      maxLength={3}
+                      placeholder="e.g., QIH"
+                      value={filters.productCode}
+                      onChange={e => setFilters(prev => ({ ...prev, productCode: e.target.value.toUpperCase() }))}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg uppercase"
+                    />
+                  </label>
+                  <HomeFilterSelect label="AI Function" value={filters.aiFunction} options={filterData.aiFunctions} onChange={value => setFilters(prev => ({ ...prev, aiFunction: value }))} />
+                  <HomeFilterSelect label="Estimated FDA Device Class" value={filters.deviceClass} options={['I', 'II', 'III']} onChange={value => setFilters(prev => ({ ...prev, deviceClass: value }))} />
+                  <HomeFilterSelect label="Estimated §524B Applicability" value={filters.cyberDevice} options={['Likely applicable', 'Not identified']} onChange={value => setFilters(prev => ({ ...prev, cyberDevice: value }))} />
+                  <div className="sm:col-span-2 lg:col-span-4">
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Decision year</label>
+                    <div className="grid grid-cols-2 gap-3 sm:max-w-sm">
+                      <input
+                        type="number"
+                        min="1990"
+                        max="2100"
+                        placeholder="From"
+                        value={filters.yearFrom}
+                        onChange={e => setFilters(prev => ({ ...prev, yearFrom: e.target.value }))}
+                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg"
+                      />
+                      <input
+                        type="number"
+                        min="1990"
+                        max="2100"
+                        placeholder="To"
+                        value={filters.yearTo}
+                        onChange={e => setFilters(prev => ({ ...prev, yearTo: e.target.value }))}
+                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 mt-3">Enter a topic, or select one or more filters to browse matching devices. Device class and §524B applicability are ESL estimates based on public submission data.</p>
               </div>
             </form>
           </div>
@@ -280,5 +345,21 @@ function StatCard({ label, value }: { label: string; value: string }) {
       <div className="text-2xl font-bold text-gray-900">{value}</div>
       <div className="text-sm text-gray-500 mt-1">{label}</div>
     </div>
+  );
+}
+
+function HomeFilterSelect({ label, value, options, onChange }: { label: string; value: string; options: string[]; onChange: (value: string) => void }) {
+  return (
+    <label className="block">
+      <span className="block text-xs font-medium text-gray-600 mb-1">{label}</span>
+      <select
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white"
+      >
+        <option value="all">All</option>
+        {options.map(option => <option key={option} value={option}>{option}</option>)}
+      </select>
+    </label>
   );
 }

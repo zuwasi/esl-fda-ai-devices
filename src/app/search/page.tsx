@@ -13,14 +13,15 @@ export default function SearchPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [totalRecords, setTotalRecords] = useState(0);
-  const [filterData, setFilterData] = useState({ panels: [] as string[], companies: [] as string[], dataTypes: [] as string[] });
-  const [filters, setFilters] = useState<{ panel: string; company: string; pathway: string; dataType: string; yearFrom: string; yearTo: string }>({
-    panel: 'all', company: 'all', pathway: 'all', dataType: 'all', yearFrom: '', yearTo: ''
+  const [filterData, setFilterData] = useState({ panels: [] as string[], companies: [] as string[], dataTypes: [] as string[], aiFunctions: [] as string[] });
+  const [filters, setFilters] = useState({
+    panel: 'all', company: 'all', pathway: 'all', dataType: 'all', productCode: '',
+    aiFunction: 'all', deviceClass: 'all', cyberDevice: 'all', yearFrom: '', yearTo: ''
   });
 
   useEffect(() => {
     fetch('/api/search').then(r => r.json()).then(d => {
-      setFilterData({ panels: d.panels || [], companies: d.companies || [], dataTypes: d.dataTypes || [] });
+      setFilterData({ panels: d.panels || [], companies: d.companies || [], dataTypes: d.dataTypes || [], aiFunctions: d.aiFunctions || [] });
     }).catch(() => {});
   }, []);
 
@@ -99,6 +100,15 @@ export default function SearchPage() {
               <FilterSelect label="Regulatory Pathway" value={filters.pathway} options={['510(k)', 'De Novo', 'PMA']} onChange={v => handleFilterChange('pathway', v)} />
               <FilterSelect label="Data Type" value={filters.dataType} options={filterData.dataTypes} onChange={v => handleFilterChange('dataType', v)} />
               <div>
+                <label className="text-xs font-medium text-gray-600">FDA Product Code</label>
+                <input type="text" maxLength={3} placeholder="e.g., QIH" value={filters.productCode}
+                  onChange={e => handleFilterChange('productCode', e.target.value.toUpperCase())}
+                  className="w-full mt-1 px-3 py-2 text-sm border border-gray-300 rounded uppercase" />
+              </div>
+              <FilterSelect label="AI Function" value={filters.aiFunction} options={filterData.aiFunctions} onChange={v => handleFilterChange('aiFunction', v)} />
+              <FilterSelect label="Estimated FDA Device Class" value={filters.deviceClass} options={['I', 'II', 'III']} onChange={v => handleFilterChange('deviceClass', v)} />
+              <FilterSelect label="Estimated §524B Applicability" value={filters.cyberDevice} options={['Likely applicable', 'Not identified']} onChange={v => handleFilterChange('cyberDevice', v)} />
+              <div>
                 <label className="text-xs font-medium text-gray-600">Year Range</label>
                 <div className="flex gap-2 mt-1">
                   <input type="text" placeholder="From" value={filters.yearFrom} onChange={e => handleFilterChange('yearFrom', e.target.value)}
@@ -107,7 +117,8 @@ export default function SearchPage() {
                     className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded" />
                 </div>
               </div>
-              <button onClick={() => { setFilters({ panel: 'all', company: 'all', pathway: 'all', dataType: 'all', yearFrom: '', yearTo: '' }); setPage(1); }}
+              <p className="text-xs text-gray-500">Device class and §524B applicability are ESL estimates.</p>
+              <button onClick={() => { setFilters({ panel: 'all', company: 'all', pathway: 'all', dataType: 'all', productCode: '', aiFunction: 'all', deviceClass: 'all', cyberDevice: 'all', yearFrom: '', yearTo: '' }); setPage(1); }}
                 className="w-full text-sm text-gray-500 hover:text-gray-700 py-2">Clear filters</button>
             </div>
           </aside>
