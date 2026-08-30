@@ -51,10 +51,16 @@ export default function Footer() {
         </div>
         <div className="mt-8 pt-8 border-t border-gray-700 flex flex-col gap-4">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-            <p className="text-xs text-gray-500">
-              This platform is an assistive tool and may make errors. Not legal or regulatory advice.
-              The manufacturer retains responsibility for safety, effectiveness, and submissions.
-            </p>
+            <div className="flex flex-col gap-2">
+              <p className="text-xs text-gray-500">
+                This platform is an assistive tool and may make errors. Not legal or regulatory advice.
+                The manufacturer retains responsibility for safety, effectiveness, and submissions.
+              </p>
+              <div className="flex items-center gap-4 text-xs text-gray-400">
+                <a href="/privacy" className="hover:text-gray-300">Privacy Policy</a>
+                <a href="/terms" className="hover:text-gray-300">Terms of Use</a>
+              </div>
+            </div>
             <div className="flex items-center gap-4 text-xs text-gray-400 whitespace-nowrap">
               <span>Powered by SBOMator</span>
               <span>|</span>

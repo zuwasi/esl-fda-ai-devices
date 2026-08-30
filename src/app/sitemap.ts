@@ -27,6 +27,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: SITE_URL + '/about', lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.8 },
     { url: SITE_URL + '/case-studies', lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.6 },
     { url: SITE_URL + '/assessment', lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.6 },
+    { url: SITE_URL + '/privacy', lastModified: new Date(), changeFrequency: 'yearly' as const, priority: 0.3 },
+    { url: SITE_URL + '/terms', lastModified: new Date(), changeFrequency: 'yearly' as const, priority: 0.3 },
   ];
 
   return [...staticUrls, ...deviceUrls];
