@@ -29,6 +29,36 @@ export default function DeviceDetailPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
+  useEffect(() => {
+    if (!data?.record) return;
+    const r = data.record;
+    const pathway = r.submission_number?.toUpperCase().startsWith('K') ? '510(k)'
+      : r.submission_number?.toUpperCase().startsWith('DEN') ? 'De Novo'
+      : r.submission_number?.toUpperCase().startsWith('P') ? 'PMA' : '';
+    const jsonLd = {
+      '@context': 'https://schema.org',
+      '@type': 'MedicalDevice',
+      name: r.device_model || 'Unnamed Device',
+      manufacturer: { '@type': 'Organization', name: r.company },
+      identifier: r.submission_number,
+      regulatoryID: r.submission_number,
+      category: r.ai_function || '',
+      applicationCategory: 'Medical Device',
+      deviceCategory: pathway,
+      dateApproved: r.date_of_final_decision,
+      description: r.thesis || '',
+      url: 'https://esl-fda.io/device/' + r.submission_number,
+    };
+    const existing = document.getElementById('device-jsonld');
+    if (existing) existing.remove();
+    const script = document.createElement('script');
+    script.id = 'device-jsonld';
+    script.type = 'application/ld+json';
+    script.textContent = JSON.stringify(jsonLd);
+    document.head.appendChild(script);
+    return () => { const el = document.getElementById('device-jsonld'); if (el) el.remove(); };
+  }, [data]);
+
   async function analyzePdf() {
     if (!data?.record?.summary_pdf_link?.startsWith('http')) return;
     setPdfAnalyzing(true);
@@ -70,35 +100,6 @@ export default function DeviceDetailPage() {
   );
 
   const { record: r, cyber, risk } = data;
-
-  useEffect(() => {
-    if (!r) return;
-    const pathway = r.submission_number?.toUpperCase().startsWith('K') ? '510(k)'
-      : r.submission_number?.toUpperCase().startsWith('DEN') ? 'De Novo'
-      : r.submission_number?.toUpperCase().startsWith('P') ? 'PMA' : '';
-    const jsonLd = {
-      '@context': 'https://schema.org',
-      '@type': 'MedicalDevice',
-      name: r.device_model || 'Unnamed Device',
-      manufacturer: { '@type': 'Organization', name: r.company },
-      identifier: r.submission_number,
-      regulatoryID: r.submission_number,
-      category: r.ai_function || '',
-      applicationCategory: 'Medical Device',
-      deviceCategory: pathway,
-      dateApproved: r.date_of_final_decision,
-      description: r.thesis || '',
-      url: 'https://esl-fda.io/device/' + r.submission_number,
-    };
-    const existing = document.getElementById('device-jsonld');
-    if (existing) existing.remove();
-    const script = document.createElement('script');
-    script.id = 'device-jsonld';
-    script.type = 'application/ld+json';
-    script.textContent = JSON.stringify(jsonLd);
-    document.head.appendChild(script);
-    return () => { const el = document.getElementById('device-jsonld'); if (el) el.remove(); };
-  }, [r]);
 
   return (
     <div>
