@@ -6,12 +6,11 @@ export default function BreakingBanner() {
     <div
       role="region"
       aria-label="Announcement"
-      className="text-white"
-      style={{ background: 'linear-gradient(135deg, hsl(0, 72%, 48%) 0%, hsl(14, 82%, 50%) 100%)' }}
+      className="border-b border-amber-200 bg-amber-50 text-gray-800"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-3 flex-wrap py-2.5">
-        <span className="inline-flex items-center gap-1.5 font-bold text-xs tracking-wider uppercase bg-white/20 px-2.5 py-1 rounded-full whitespace-nowrap">
-          <span className="w-2 h-2 rounded-full bg-white animate-pulse motion-reduce:animate-none" />
+        <span className="inline-flex items-center gap-1.5 font-bold text-xs tracking-wider uppercase bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full whitespace-nowrap">
+          <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse motion-reduce:animate-none" />
           Breaking
         </span>
         <span className="text-sm font-medium">
@@ -21,7 +20,7 @@ export default function BreakingBanner() {
             href={FDA_DISCUSSION_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="font-bold underline whitespace-nowrap hover:opacity-90"
+            className="font-bold text-blue-700 underline whitespace-nowrap hover:text-blue-900"
           >
             Read more &rarr;
           </a>
