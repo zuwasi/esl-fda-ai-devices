@@ -1,0 +1,28 @@
+# ESL FDA AI Device Intelligence
+
+> A free public platform for searching FDA-authorized AI medical devices and reviewing regulatory risk, cybersecurity evidence, and IEC 62304 risk classifications.
+
+Canonical site: https://esl-fda.io/
+
+## Primary resources
+
+- [Search FDA AI devices](https://esl-fda.io/search): Search by clinical need, company, regulatory pathway, data type, AI function, product code, FDA class, and Section 524B applicability.
+- [Submission readiness assessment](https://esl-fda.io/assessment): Identify gaps in an FDA software-evidence package.
+- [Case studies](https://esl-fda.io/case-studies): Regulatory software-evidence and remediation examples.
+- [About the platform](https://esl-fda.io/about): Scope, methodology, attribution, and ESL services.
+- [XML sitemap](https://esl-fda.io/sitemap.xml): Canonical index of all device-detail pages.
+
+## Device pages
+
+Device records use stable FDA submission-number URLs:
+
+https://esl-fda.io/device/{submission_number}
+
+Each page identifies the device, manufacturer, FDA pathway, decision date, clinical purpose, AI function, cybersecurity evidence indicators, and estimated IEC 62304 risk class. Platform-generated classifications are assistive engineering analysis, not FDA determinations or regulatory advice.
+
+## Attribution and contact
+
+The search foundation is based on FDA AI Search by Kavishwar and Lotter (Dana-Farber/Harvard, ML4H 2025, CC BY 4.0). Regulatory-engineering layers are provided by Engineering Software Lab (ESL).
+
+- Website: https://www.eswlab.com/
+- Contact: sales@eswlab.com

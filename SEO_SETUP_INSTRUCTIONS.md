@@ -11,11 +11,12 @@
 
 The website is live at **https://esl-fda.io** with full SEO infrastructure already in place:
 
-- Sitemap: https://esl-fda.io/sitemap.xml (1,248 device pages + 5 static pages)
+- Sitemap: https://esl-fda.io/sitemap.xml (1,232 device pages + 7 static pages)
 - Robots.txt: https://esl-fda.io/robots.txt
+- LLM guidance: https://esl-fda.io/llms.txt
 - Per-page metadata (title, description, canonical URLs) on all pages
 - OpenGraph and Twitter Card tags on all pages
-- JSON-LD structured data (schema.org MedicalDevice) on every device detail page
+- Server-rendered content and JSON-LD structured data (schema.org MedicalDevice) on every device detail page
 - PWA manifest: https://esl-fda.io/manifest.webmanifest
 
 **Your job:** Register the site with Google and Bing search consoles, verify ownership, submit the sitemap, and request initial indexing. No code changes are required - everything below is done through web dashboards.

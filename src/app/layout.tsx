@@ -3,6 +3,29 @@ import './globals.css';
 
 const SITE_URL = 'https://esl-fda.io';
 
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': 'https://eswlab.com/#organization',
+      name: 'Engineering Software Lab',
+      alternateName: 'ESL',
+      url: 'https://eswlab.com/',
+      logo: `${SITE_URL}/esl-icon.png`,
+      email: 'sales@eswlab.com',
+    },
+    {
+      '@type': 'WebSite',
+      '@id': `${SITE_URL}/#website`,
+      name: 'ESL FDA AI Device Intelligence',
+      url: `${SITE_URL}/`,
+      description: 'Search FDA-authorized AI medical devices with regulatory risk monitoring, cybersecurity evidence analysis, and IEC 62304 risk classification.',
+      publisher: { '@id': 'https://eswlab.com/#organization' },
+    },
+  ],
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
@@ -46,7 +69,14 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className="min-h-screen bg-gray-50 text-gray-900 antialiased">{children}</body>
+      <body className="min-h-screen bg-gray-50 text-gray-900 antialiased">
+        <script
+          id="site-jsonld"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
+        {children}
+      </body>
     </html>
   );
 }
