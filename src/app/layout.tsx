@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import BreakingBanner from '@/components/BreakingBanner';
 import './globals.css';
 
 const SITE_URL = 'https://esl-fda.io';
@@ -46,7 +47,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className="min-h-screen bg-gray-50 text-gray-900 antialiased">{children}</body>
+      <body className="min-h-screen bg-gray-50 text-gray-900 antialiased">
+        <BreakingBanner />
+        {children}
+      </body>
     </html>
   );
 }
