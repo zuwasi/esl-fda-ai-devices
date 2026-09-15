@@ -1,5 +1,6 @@
 ﻿import type { MetadataRoute } from 'next';
 import { getDeviceIds } from '@/lib/devices';
+import { caseStudies } from '@/lib/caseStudies';
 
 const SITE_URL = 'https://esl-fda.io';
 
@@ -19,6 +20,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: SITE_URL + '/search', lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.9 },
     { url: SITE_URL + '/about', lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.8 },
     { url: SITE_URL + '/case-studies', lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.6 },
+    ...['unit-testing-code-coverage', ...caseStudies.map(cs => cs.id)].map((id) => ({
+      url: SITE_URL + '/case-studies/' + id,
+      lastModified: new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
+    })),
     { url: SITE_URL + '/assessment', lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.6 },
     { url: SITE_URL + '/privacy', lastModified: new Date(), changeFrequency: 'yearly' as const, priority: 0.3 },
     { url: SITE_URL + '/terms', lastModified: new Date(), changeFrequency: 'yearly' as const, priority: 0.3 },

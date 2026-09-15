@@ -240,7 +240,9 @@ export default function AboutPage() {
                     </a>
                   )}
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-4">{cs.title}</h3>
+                <h3 className="text-lg font-bold text-gray-900 mb-4">
+                  <a href={'/case-studies/' + cs.id} className="hover:text-blue-700">{cs.title}</a>
+                </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <h4 className="text-sm font-semibold text-red-900 mb-2">Before ESL</h4>

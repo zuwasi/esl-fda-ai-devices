@@ -1,7 +1,56 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+
 const FDA_DISCUSSION_URL =
   'https://www.fda.gov/medical-devices/digital-health-center-excellence/considerations-regulation-generative-ai-enabled-medical-devices-discussion-paper-and-request';
 
+const CASE_STUDY_URL = '/case-studies/unit-testing-code-coverage';
+
+const FLASHES = [
+  {
+    label: 'Breaking',
+    text: (
+      <>
+        FDA seeks feedback on regulating <strong>Generative AI-enabled medical devices</strong> - public
+        comments open through Oct 19, 2026.{' '}
+        <a
+          href={FDA_DISCUSSION_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-bold text-blue-700 underline whitespace-nowrap hover:text-blue-900"
+        >
+          Read more &rarr;
+        </a>
+      </>
+    ),
+  },
+  {
+    label: 'New Brief',
+    text: (
+      <>
+        New ESL executive brief: <strong>Static Code Analysis Alone Is Not Enough</strong> - adding unit
+        testing &amp; code coverage, built on seven FDA enforcement cases.{' '}
+        <a href={CASE_STUDY_URL} className="font-bold text-blue-700 underline whitespace-nowrap hover:text-blue-900">
+          Read more &rarr;
+        </a>
+      </>
+    ),
+  },
+];
+
 export default function BreakingBanner() {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIndex(i => (i + 1) % FLASHES.length);
+    }, 3000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const flash = FLASHES[index];
+
   return (
     <div
       role="region"
@@ -9,21 +58,15 @@ export default function BreakingBanner() {
       className="border-b border-amber-200 bg-amber-50 text-gray-800"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-3 flex-wrap py-2.5">
-        <span className="inline-flex items-center gap-1.5 font-bold text-xs tracking-wider uppercase bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full whitespace-nowrap">
+        <span
+          key={flash.label}
+          className="inline-flex items-center gap-1.5 font-bold text-xs tracking-wider uppercase bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full whitespace-nowrap"
+        >
           <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse motion-reduce:animate-none" />
-          Breaking
+          {flash.label}
         </span>
-        <span className="text-sm font-medium">
-          FDA seeks feedback on regulating <strong>Generative AI-enabled medical devices</strong> — public
-          comments open through Oct 19, 2026.{' '}
-          <a
-            href={FDA_DISCUSSION_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-bold text-blue-700 underline whitespace-nowrap hover:text-blue-900"
-          >
-            Read more &rarr;
-          </a>
+        <span key={index} className="text-sm font-medium banner-swap">
+          {flash.text}
         </span>
       </div>
     </div>
