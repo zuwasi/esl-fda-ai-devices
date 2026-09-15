@@ -21,6 +21,13 @@ interface RegulatoryData {
   warningLetters: { letters: WarningLetter[]; total: number; searchUrl: string; note: string };
 }
 
+interface RiskSummaryData {
+  summary: string;
+  themes: string[];
+  trend: 'improving' | 'stable' | 'worsening';
+  cached?: boolean;
+}
+
 function primaryCompanyName(company: string) {
   const cleaned = company.replace(/[.,]/g, ' ').trim();
   const words = cleaned.split(/\s+/).filter(w => w.length > 2 && !['Inc', 'LLC', 'Corp', 'Ltd', 'Co', 'The', 'And', 'GmbH', 'SA', 'AG'].includes(w));
@@ -40,9 +47,19 @@ export default function RegulatoryConcerns({ company, deviceName }: { company: s
   const [error, setError] = useState('');
   const [tab, setTab] = useState<'recalls' | 'events' | 'warnings'>('recalls');
   const [scope, setScope] = useState<'device' | 'company'>('device');
+  const [riskSummary, setRiskSummary] = useState<RiskSummaryData | null>(null);
+
+  async function loadRiskSummary() {
+    try {
+      const res = await fetch('/api/risk-summary?company=' + encodeURIComponent(company) + '&deviceName=' + encodeURIComponent(deviceName));
+      const result = await res.json();
+      if (result.available) setRiskSummary(result);
+    } catch { /* graceful: modal works without the AI summary */ }
+  }
 
   async function handleClick() {
     setOpen(true);
+    if (!riskSummary) loadRiskSummary();
     if (data) return;
     setLoading(true);
     setError('');
@@ -99,6 +116,22 @@ export default function RegulatoryConcerns({ company, deviceName }: { company: s
               <span className={total ? 'font-medium text-red-600' : 'font-medium text-green-600'}>{total ? (scope === 'device' ? total.toLocaleString() + ' regulatory concerns for this device' : total.toLocaleString() + ' total regulatory concerns for ' + company) : 'No recalls or adverse events found in FDA databases'}</span>
               <span className={'text-xs text-gray-400' + ''}>Source: openFDA API</span>
             </div>
+            {riskSummary && <div className={'mx-5 mt-4 p-4 rounded-lg bg-blue-50 border border-blue-100' + ''}>
+              <div className={'flex items-center justify-between gap-2 mb-1.5' + ''}>
+                <span className={'inline-flex items-center gap-1.5 text-xs font-semibold text-blue-700' + ''}>
+                  <SparkleIcon className={'w-4 h-4' + ''} /> AI Risk Summary
+                </span>
+                <div className={'flex items-center gap-2' + ''}>
+                  <span className={'text-xs px-2 py-0.5 rounded-full font-medium ' + (riskSummary.trend === 'worsening' ? 'bg-red-100 text-red-700' : riskSummary.trend === 'improving' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600')}>Trend: {riskSummary.trend}</span>
+                  {riskSummary.cached && <span className={'text-xs text-blue-400' + ''}>(cached)</span>}
+                </div>
+              </div>
+              <p className={'text-sm text-gray-800' + ''}>{riskSummary.summary}</p>
+              {riskSummary.themes.length > 0 && <div className={'flex flex-wrap gap-1.5 mt-2' + ''}>
+                {riskSummary.themes.map((theme, index) => <span key={index} className={'text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 font-medium' + ''}>{theme}</span>)}
+              </div>}
+              <p className={'text-xs text-gray-400 mt-2' + ''}>AI-generated from the FDA data below. Verify against official FDA sources before making decisions.</p>
+            </div>}
             <div className={'flex border-b border-gray-200 px-5' + ''}>
               <TabButton active={tab === 'recalls'} onClick={() => setTab('recalls')} label="Recalls" count={concerns.recalls.total} />
               <TabButton active={tab === 'events'} onClick={() => setTab('events')} label="Adverse Events" count={concerns.adverseEvents.total} />
@@ -142,6 +175,8 @@ export default function RegulatoryConcerns({ company, deviceName }: { company: s
 }
 
 function WarningIcon({ className }: { className: string }) { return <svg className={className + ''} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>; }
+
+function SparkleIcon({ className }: { className: string }) { return <svg className={className} fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l1.9 5.7a2 2 0 001.3 1.3L21 11l-5.8 1.9a2 2 0 00-1.3 1.3L12 20l-1.9-5.8a2 2 0 00-1.3-1.3L3 11l5.8-2a2 2 0 001.3-1.3L12 2z" /></svg>; }
 
 function TabButton({ active, onClick, label, count }: { active: boolean; onClick: () => void; label: string; count: number | null }) {
   return <button onClick={onClick} className={'px-4 py-3 text-sm font-medium border-b-2 transition-colors ' + (active ? 'border-red-600 text-red-600' : 'border-transparent text-gray-500 hover:text-gray-700')}>{label}{count !== null && count > 0 && <span className={'ml-2 px-1.5 py-0.5 text-xs rounded-full font-bold ' + (active ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-600')}>{count > 999 ? '999+' : count.toLocaleString()}</span>}</button>;

@@ -5,7 +5,10 @@
 
 ---
 
-# 1. AI-Enhanced Regulatory Concerns Summary (High Priority)
+# 1. AI-Enhanced Regulatory Concerns Summary (High Priority) - IMPLEMENTED (pending LLM API key in Railway)
+
+**Status:** Implemented September 2026. New server route `/api/risk-summary` + AI summary panel in the Regulatory Concerns modal (summary, top 3 risk themes, trend badge, disclaimer). Provider is selected from whichever env var is set: `GEMINI_API_KEY` (gemini-2.0-flash), `OPENAI_API_KEY` (gpt-4o-mini), or `ANTHROPIC_API_KEY` (claude-haiku-4-5). Results cached in memory per company+device for 24h. Graceful degradation: without a key or on API failure the modal works exactly as before.
+**Remaining:** Set one of the API key env vars in Railway to enable live summaries.
 
 **Problem:** The Regulatory Concerns modal currently shows raw FDA data - individual recall cards, individual adverse event cards. A user seeing "37 recalls, 12,119 adverse events" for a company like Medtronic has to read through them one by one.
 
