@@ -45,8 +45,8 @@ export default function AboutPage() {
           <h2 className="text-xl font-bold mb-3">The Platform in One Sentence</h2>
           <p className="text-lg text-blue-100 leading-relaxed mb-4">
             ESL FDA AI Device Intelligence is the only free public platform that combines semantic search
-            of every FDA-authorized AI medical device with live regulatory risk monitoring — recalls,
-            adverse events, and warning letters — plus cybersecurity evidence analysis and IEC 62304 risk
+            of every FDA-authorized AI medical device with live regulatory risk monitoring - recalls,
+            adverse events, and warning letters - plus cybersecurity evidence analysis and IEC 62304 risk
             classification.
           </p>
           <p className="text-base text-blue-200">
@@ -59,9 +59,9 @@ export default function AboutPage() {
         {/* Key Differentiators */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
           {[
-            { title: 'Right-Sized to Your Submission', body: 'Not every product needs every activity. ESL identifies the applicable scope with your team — then performs only the work needed.' },
+            { title: 'Right-Sized to Your Submission', body: 'Not every product needs every activity. ESL identifies the applicable scope with your team - then performs only the work needed.' },
             { title: 'End-to-End Remediation', body: 'A long finding list does not help a submission. ESL closes the engineering loop: find it, understand it, fix it, prove it.' },
-            { title: 'Engineers Who Fix, Not Reassign', body: 'Source is repaired by experienced engineers — not merely reassigned back to your team. Before/after evidence is retained.' },
+            { title: 'Engineers Who Fix, Not Reassign', body: 'Source is repaired by experienced engineers - not merely reassigned back to your team. Before/after evidence is retained.' },
           ].map(item => (
             <div key={item.title} className="bg-white rounded-xl border border-gray-200 p-5">
               <h3 className="font-semibold text-gray-900 mb-2 text-sm">{item.title}</h3>
@@ -73,16 +73,16 @@ export default function AboutPage() {
         {/* Four Services */}
         <div className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Four Software-Evidence Services. One Engagement.</h2>
-          <p className="text-gray-600 mb-6 text-sm">Combine SBOM, CVE remediation, static analysis, code repair, unit tests, coverage, and ALM traceability — or take only the individual service you need.</p>
+          <p className="text-gray-600 mb-6 text-sm">Combine SBOM, CVE remediation, static analysis, code repair, unit tests, coverage, and ALM traceability - or take only the individual service you need.</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {[
-              { num: '01', title: 'SBOM Reports — Even From Binaries Only', points: [
+              { num: '01', title: 'SBOM Reports - Even From Binaries Only', points: [
                 'Machine-readable SBOM plus human-readable inventory',
                 'Known-vulnerability correlation, incl. binary-only discovery',
                 'Applicability analysis, remediation & documented rationale',
                 'Rescan after changes, residual status made explicit',
               ]},
-              { num: '02', title: 'Static Code Analysis — and Actual Fixes', points: [
+              { num: '02', title: 'Static Code Analysis - and Actual Fixes', points: [
                 'Rules & severity profile tuned to language and policy',
                 'Findings triaged: defects, deviations, false positives',
                 'MISRA C/C++, CERT C/C++, CWE & project rules',
@@ -122,7 +122,7 @@ export default function AboutPage() {
         <div className="mb-12">
           <div className="bg-gradient-to-br from-blue-900 to-blue-700 rounded-2xl p-8 text-white">
             <h2 className="text-2xl font-bold mb-2">Find It. Understand It. Fix It. Prove It.</h2>
-            <p className="text-blue-100 mb-6 text-sm">ESL closes the engineering loop for both source-code defects and software-component vulnerabilities — one repeatable remediation workflow.</p>
+            <p className="text-blue-100 mb-6 text-sm">ESL closes the engineering loop for both source-code defects and software-component vulnerabilities - one repeatable remediation workflow.</p>
             <div className="grid grid-cols-1 sm:grid-cols-5 gap-4">
               {[
                 { step: '1', title: 'Discover', body: 'Scan source, builds, dependencies, containers, firmware, and binaries.' },
@@ -224,7 +224,7 @@ export default function AboutPage() {
 
         {/* Verified Case Studies */}
         <div className="mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Proof — Not Just Claims</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Proof - Not Just Claims</h2>
           <p className="text-gray-600 mb-6 text-sm">Real, verified case studies from ESL's FDA and Parasoft engagements.</p>
           <div className="space-y-4">
             {verifiedCaseStudies.map(cs => (
@@ -313,15 +313,15 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {[
               'FDA Cybersecurity in Medical Devices (2026)',
-              'FD&C Act §524B — Cyber device requirements',
+              'FD&C Act §524B - Cyber device requirements',
               'FDA General Principles of Software Validation',
-              'IEC 62304 — Medical device software lifecycle',
-              'ISO 14971 — Risk management',
-              'MISRA C/C++ — Coding standards (2004/2012/2023)',
-              'CERT C/C++ — Secure coding',
-              'CWE — Common weakness enumeration',
-              'CVSS v4.0 — Vulnerability scoring',
-              'CycloneDX + VEX — SBOM format',
+              'IEC 62304 - Medical device software lifecycle',
+              'ISO 14971 - Risk management',
+              'MISRA C/C++ - Coding standards (2004/2012/2023)',
+              'CERT C/C++ - Secure coding',
+              'CWE - Common weakness enumeration',
+              'CVSS v4.0 - Vulnerability scoring',
+              'CycloneDX + VEX - SBOM format',
             ].map(s => (
               <div key={s} className="flex items-center gap-2 text-sm text-gray-700 bg-white rounded-lg border border-gray-200 px-4 py-3">
                 <span className="w-5 h-5 rounded bg-blue-100 text-blue-600 flex items-center justify-center text-xs flex-shrink-0">✓</span>
@@ -336,7 +336,7 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[
               { title: 'Source Languages', body: 'C, C++, C#, Java, VB.NET, and other stacks through suitable static-analysis, testing, and software-composition technologies.' },
-              { title: 'Execution Targets', body: 'Desktop, server, cloud, container, mobile, cross-compiled, and resource-constrained embedded targets — including on-target testing.' },
+              { title: 'Execution Targets', body: 'Desktop, server, cloud, container, mobile, cross-compiled, and resource-constrained embedded targets - including on-target testing.' },
               { title: 'Available Artifacts', body: 'Full repositories, partial source, package manifests, build outputs, containers, firmware, and binaries. SBOM work does not require a perfect source tree.' },
             ].map(item => (
               <div key={item.title} className="bg-white rounded-xl border border-gray-200 p-5">
@@ -349,11 +349,11 @@ export default function AboutPage() {
 
         {/* CTA */}
         <div className="mb-12 bg-gradient-to-br from-blue-900 to-blue-700 rounded-2xl p-8 text-white text-center">
-          <h2 className="text-xl font-bold mb-3">Bring ESL the Software — Not a Cleaned-Up Demo</h2>
+          <h2 className="text-xl font-bold mb-3">Bring ESL the Software - Not a Cleaned-Up Demo</h2>
           <p className="text-blue-100 mb-6 max-w-xl mx-auto text-sm">
             We will build, clean, and connect the evidence. Start with a software-evidence scoping workshop:
             ESL reviews your intended submission context, software stack, available artifacts, existing tests,
-            and ALM environment — then defines the smallest complete work package needed.
+            and ALM environment - then defines the smallest complete work package needed.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <a href="https://eswlab.com/contact-us/?your-subject=FDA%20Software%20Evidence%20Scoping%20Workshop"
@@ -447,12 +447,12 @@ export default function AboutPage() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {[
-                { title: 'Cybersecurity Evidence Layer', body: 'SBOM presence detection, §524B cyber-device compliance indicators, and CVE management signals per device — powered by SBOMator™.' },
+                { title: 'Cybersecurity Evidence Layer', body: 'SBOM presence detection, §524B cyber-device compliance indicators, and CVE management signals per device - powered by SBOMator™.' },
                 { title: 'IEC 62304 Risk Classification', body: 'Automatic Class A / B / C assignment based on device summary analysis, plus FDA device class estimation (Class I / II / III).' },
-                { title: 'Evidence Requirements Mapper', body: 'IEC 62304 evidence requirements mapped to each risk class and regulatory pathway — what the submission actually needs.' },
-                { title: 'Submission Readiness Assessment', body: 'Interactive 3-step wizard producing a gap analysis and prioritized action plan — not just a search result, but a roadmap.' },
+                { title: 'Evidence Requirements Mapper', body: 'IEC 62304 evidence requirements mapped to each risk class and regulatory pathway - what the submission actually needs.' },
+                { title: 'Submission Readiness Assessment', body: 'Interactive 3-step wizard producing a gap analysis and prioritized action plan - not just a search result, but a roadmap.' },
                 { title: 'Consultancy Integration', body: 'Verified case studies, scoping-workshop CTAs, and dual-pillar (SBOMator + Parasoft) positioning connecting search to action.' },
-                { title: 'Regulatory Intelligence Workflow', body: 'The "Find it. Understand it. Fix it. Prove it." methodology applied to every device — from discovery to evidence.' },
+                { title: 'Regulatory Intelligence Workflow', body: 'The "Find it. Understand it. Fix it. Prove it." methodology applied to every device - from discovery to evidence.' },
               ].map(item => (
                 <div key={item.title} className="bg-white/70 rounded-lg p-3 border border-blue-100">
                   <h4 className="text-sm font-semibold text-gray-900 mb-1">{item.title}</h4>
@@ -464,7 +464,7 @@ export default function AboutPage() {
               <p className="text-xs text-gray-600">
                 <strong>In short:</strong> The original tool helps you{' '}
                 <em>find</em> FDA-authorized AI devices. ESL&apos;s platform helps you{' '}
-                <em>find, understand, assess, and act on</em> them — connecting each device to the
+                <em>find, understand, assess, and act on</em> them - connecting each device to the
                 cybersecurity, risk-class, evidence, and submission-readiness context that a regulatory
                 submission actually requires.
               </p>

@@ -71,7 +71,7 @@ export default function Home() {
                 </h1>
                 <p className="text-lg sm:text-xl text-blue-100 mb-8">
                   The only free public platform that combines semantic search of every FDA-authorized AI medical device
-                  with live regulatory risk monitoring — recalls, adverse events, and warning letters — plus cybersecurity
+                  with live regulatory risk monitoring - recalls, adverse events, and warning letters - plus cybersecurity
                   evidence analysis and IEC 62304 risk classification.
                 </p>
               </div>
@@ -276,7 +276,7 @@ export default function Home() {
               <h2 className="text-2xl font-bold mb-4">Why This Platform Exists</h2>
               <p className="text-lg text-blue-100 leading-relaxed mb-6 max-w-3xl">
                 ESL FDA AI Device Intelligence transforms FDA&apos;s opaque approval database into actionable
-                intelligence for patients, clinicians, and device manufacturers — while positioning ESL as the
+                intelligence for patients, clinicians, and device manufacturers - while positioning ESL as the
                 go-to consultancy for FDA software evidence and regulatory remediation.
               </p>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -285,7 +285,7 @@ export default function Home() {
                   <h3 className="font-semibold mb-2 text-sm">For the Public &amp; Patients</h3>
                   <p className="text-sm text-blue-200">
                     Search every FDA-authorized AI device by what it does. See recalls, adverse events, and
-                    warning letters — live from FDA databases, free, no login.
+                    warning letters - live from FDA databases, free, no login.
                   </p>
                 </div>
                 <div className="bg-white/10 rounded-xl p-5">

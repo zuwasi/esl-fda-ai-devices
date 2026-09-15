@@ -47,7 +47,7 @@ export function getEvidenceRequirements(
       standard: 'MISRA C/C++ or CERT C/C++',
       requirement: 'Static Code Analysis Report',
       applicable: true,
-      eslCapability: 'Parasoft C/C++test (T\u00dcV S\u00dcD certified) with ESL remediation \u2014 not just scan-and-leave.',
+      eslCapability: 'Parasoft C/C++test (T\u00dcV S\u00dcD certified) with ESL remediation - not just scan-and-leave.',
       status: cls === 'C' ? 'required' : 'recommended',
     },
     {
@@ -61,7 +61,7 @@ export function getEvidenceRequirements(
       standard: 'IEC 62304 \u00a75.5 + risk rationale',
       requirement: 'Structural Coverage (Statement / Branch / MC/DC)',
       applicable: true,
-      eslCapability: 'Risk-based coverage: statement for Class A, branch for B, MC/DC for C \u2014 with gap justification.',
+      eslCapability: 'Risk-based coverage: statement for Class A, branch for B, MC/DC for C - with gap justification.',
       status: cls === 'C' ? 'required' : cls === 'B' ? 'recommended' : 'optional',
     },
     {
@@ -75,7 +75,7 @@ export function getEvidenceRequirements(
       standard: 'IEC 62304 + ALM',
       requirement: 'Traceability Matrix (Requirements \u2192 Risk \u2192 Tests \u2192 Results)',
       applicable: true,
-      eslCapability: 'ESL integrates with Polarion ALM via Parasoft connector \u2014 end-to-end traceable navigation.',
+      eslCapability: 'ESL integrates with Polarion ALM via Parasoft connector - end-to-end traceable navigation.',
       status: 'required',
     },
     {
@@ -104,8 +104,8 @@ export function getEvidenceChecklist(riskClass: RiskClassification): string {
     'Software Description (IEC 62304 \u00a75.1)',
     'Software Architecture (IEC 62304 \u00a75.3)',
     'Risk Management File (ISO 14971 + IEC 62304 \u00a77)',
-    isCyber ? 'SBOM (CycloneDX) \u2014 \u00a7524B requirement' : 'SBOM (recommended)',
-    isCyber ? 'Cybersecurity Risk Assessment \u2014 FDA 2026 guidance' : 'Cybersecurity Assessment (if applicable)',
+    isCyber ? 'SBOM (CycloneDX) - \u00a7524B requirement' : 'SBOM (recommended)',
+    isCyber ? 'Cybersecurity Risk Assessment - FDA 2026 guidance' : 'Cybersecurity Assessment (if applicable)',
     'Static Analysis Report (MISRA C:2023 / CERT C compliance)',
     cls === 'C' ? 'Unit Tests + MC/DC Coverage (Class C requirement)' : 'Unit Tests + Branch Coverage',
     'Integration Test Results',

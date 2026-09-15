@@ -183,7 +183,7 @@ export default function AssessmentPage() {
                 </div>
                 <div className="flex-1 text-center sm:text-left">
                   <h2 className="text-xl font-bold text-gray-900 mb-1">
-                    {readinessScore >= 80 ? 'Strong Evidence Package' : readinessScore >= 50 ? 'Partial Evidence — Gaps Identified' : readinessScore >= 25 ? 'Significant Gaps — Action Needed' : 'Major Evidence Gaps — Start from Scratch'}
+                    {readinessScore >= 80 ? 'Strong Evidence Package' : readinessScore >= 50 ? 'Partial Evidence - Gaps Identified' : readinessScore >= 25 ? 'Significant Gaps - Action Needed' : 'Major Evidence Gaps - Start from Scratch'}
                   </h2>
                   <p className="text-sm text-gray-600">
                     {gapCount} of {evidenceItems.length} evidence areas need attention.
@@ -222,7 +222,7 @@ export default function AssessmentPage() {
               <h3 className="text-xl font-bold mb-3">Your Recommended Next Step</h3>
               <p className="text-blue-100 mb-6">
                 ESL offers a <strong>Software Evidence Scoping Workshop</strong> to assess your software stack,
-                artifacts, and tests — then define the minimum complete evidence package required for your
+                artifacts, and tests - then define the minimum complete evidence package required for your
                 {state.pathway} submission.
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">

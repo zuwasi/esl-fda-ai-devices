@@ -201,7 +201,7 @@ export default function DeviceDetailClient({ id, data }: DeviceDetailClientProps
                                   )}
                                 </div>
                                 <span className={x.detected ? 'text-green-600 font-medium' : 'text-gray-400'}>
-                                  {x.detected ? '✓ Detected' : '— Not detected'}
+                                  {x.detected ? '✓ Detected' : '- Not detected'}
                                 </span>
                               </div>
                             ))}
@@ -262,7 +262,7 @@ export default function DeviceDetailClient({ id, data }: DeviceDetailClientProps
             <div className="bg-gradient-to-br from-blue-900 to-blue-700 rounded-2xl p-6 text-white">
               <h3 className="font-semibold mb-2">Preparing a similar submission?</h3>
               <p className="text-sm text-blue-100 mb-4">
-                ESL takes complete ownership of your software evidence work —
+                ESL takes complete ownership of your software evidence work -
                 SBOM &amp; CVE remediation with <a href="https://eswlab.com/products/esl-ailogiclabs/sbomator/" target="_blank" rel="noopener noreferrer" className="text-white font-medium underline hover:text-blue-200">SBOMator™</a>,
                 static analysis &amp; unit testing with <a href="https://www.parasoft.com/blog/what-is-iec-62304-how-is-it-used-in-medical-device-compliance/" target="_blank" rel="noopener noreferrer" className="text-white font-medium underline hover:text-blue-200">Parasoft</a>,
                 traceability, and full IEC 62304 lifecycle support.
@@ -333,7 +333,7 @@ function CyberRow({ label, found, neutral, section524B, pdfMode }: { label: stri
   // Not found
   const hint = pdfMode
     ? (section524B ? 'Not found in full FDA PDF' : 'Not mentioned in FDA PDF')
-    : (section524B ? 'Not in summary — likely in full submission per §524B' : 'Not mentioned in summary');
+    : (section524B ? 'Not in summary - likely in full submission per §524B' : 'Not mentioned in summary');
   return (
     <div className="flex flex-col gap-0.5 text-sm">
       <div className="flex items-center justify-between">
