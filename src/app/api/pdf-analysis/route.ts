@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { PDFParse } from 'pdf-parse';
 import { analyzeCyberEvidenceFromText } from '@/lib/cyberAnalysis';
+import { rateLimit } from '@/lib/rateLimit';
 import type { DeviceRecord } from '@/lib/types';
 import { parse } from 'csv-parse/sync';
 import fs from 'fs';
@@ -29,11 +30,12 @@ async function loadRecords(): Promise<Record<string, DeviceRecord>> {
   return records;
 }
 
-const PDF_TEXT_CACHE: Record<string, { text: string; timestamp: number }> = {};
+const PDF_TEXT_CACHE = new Map<string, { text: string; timestamp: number }>();
+const PDF_TEXT_CACHE_MAX = 200; // bound memory from attacker-varied ids
 const CACHE_TTL = 1000 * 60 * 60 * 24; // 24 hours
 
 async function fetchPdfText(pdfUrl: string): Promise<string> {
-  const cached = PDF_TEXT_CACHE[pdfUrl];
+  const cached = PDF_TEXT_CACHE.get(pdfUrl);
   if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
     return cached.text;
   }
@@ -52,7 +54,11 @@ async function fetchPdfText(pdfUrl: string): Promise<string> {
     const parser = new PDFParse({ data: buffer });
     const data = await parser.getText();
     const text = data.text || '';
-    PDF_TEXT_CACHE[pdfUrl] = { text, timestamp: Date.now() };
+    if (PDF_TEXT_CACHE.size >= PDF_TEXT_CACHE_MAX) {
+      const oldest = PDF_TEXT_CACHE.keys().next().value;
+      if (oldest !== undefined) PDF_TEXT_CACHE.delete(oldest);
+    }
+    PDF_TEXT_CACHE.set(pdfUrl, { text, timestamp: Date.now() });
     return text;
   } finally {
     clearTimeout(timeout);
@@ -60,6 +66,9 @@ async function fetchPdfText(pdfUrl: string): Promise<string> {
 }
 
 export async function GET(req: Request) {
+  const limited = rateLimit(req, 'pdf-analysis', 10);
+  if (limited) return limited;
+
   try {
     const url = new URL(req.url);
     const id = url.searchParams.get('id');
@@ -96,8 +105,8 @@ export async function GET(req: Request) {
       snippets,
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json({ error: 'PDF analysis failed: ' + message }, { status: 500 });
+    console.error('PDF analysis error:', error);
+    return NextResponse.json({ error: 'PDF analysis failed. Please try again later.' }, { status: 500 });
   }
 }
 

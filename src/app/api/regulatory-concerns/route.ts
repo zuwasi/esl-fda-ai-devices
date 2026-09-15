@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server';
 import { getRegulatoryData, emptyConcernSet } from '@/lib/regulatory-data';
+import { rateLimit } from '@/lib/rateLimit';
 
 export async function GET(req: Request) {
+  const limited = rateLimit(req, 'regulatory-concerns', 30);
+  if (limited) return limited;
+
   const url = new URL(req.url);
   const company = url.searchParams.get('company');
   const deviceName = url.searchParams.get('deviceName');

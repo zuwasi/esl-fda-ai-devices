@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getRegulatoryData, type RegulatoryData } from '@/lib/regulatory-data';
+import { rateLimit } from '@/lib/rateLimit';
 
 interface RiskSummary {
   summary: string;
@@ -9,7 +10,8 @@ interface RiskSummary {
 
 interface CacheEntry { summary: RiskSummary; timestamp: number }
 
-const CACHE: Record<string, CacheEntry> = {};
+const CACHE = new Map<string, CacheEntry>();
+const CACHE_MAX = 500; // bound memory from attacker-varied parameters
 const CACHE_TTL = 1000 * 60 * 60 * 24; // 24 hours
 
 function llmConfig(): { provider: 'gemini' | 'openai' | 'anthropic'; key: string } | null {
@@ -100,6 +102,9 @@ async function callLlm(provider: 'gemini' | 'openai' | 'anthropic', key: string,
 }
 
 export async function GET(req: Request) {
+  const limited = rateLimit(req, 'risk-summary', 10);
+  if (limited) return limited;
+
   const url = new URL(req.url);
   const company = url.searchParams.get('company');
   const deviceName = url.searchParams.get('deviceName');
@@ -109,7 +114,7 @@ export async function GET(req: Request) {
   if (!config) return NextResponse.json({ available: false, reason: 'No LLM API key configured.' });
 
   const cacheKey = (company + '|' + deviceName).toLowerCase();
-  const cached = CACHE[cacheKey];
+  const cached = CACHE.get(cacheKey);
   if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
     return NextResponse.json({ available: true, ...cached.summary, cached: true });
   }
@@ -120,7 +125,11 @@ export async function GET(req: Request) {
     if (!hasData) return NextResponse.json({ available: false, reason: 'No regulatory concerns data to summarize.' });
 
     const summary = await callLlm(config.provider, config.key, buildContext(data));
-    CACHE[cacheKey] = { summary, timestamp: Date.now() };
+    if (CACHE.size >= CACHE_MAX) {
+      const oldest = CACHE.keys().next().value;
+      if (oldest !== undefined) CACHE.delete(oldest);
+    }
+    CACHE.set(cacheKey, { summary, timestamp: Date.now() });
     return NextResponse.json({ available: true, ...summary });
   } catch (error) {
     console.error('Risk summary API error:', error);
