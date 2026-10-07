@@ -13,6 +13,18 @@ export interface AdverseEventResult {
   mdr_text?: Array<{ text_type_code: string; text: string }>;
 }
 
+/** Public FDA page for a recall event (Res Event). */
+export function recallDetailUrl(resEventNumber: string): string | null {
+  if (!resEventNumber || resEventNumber === 'N/A') return null;
+  return 'https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfRES/res.cfm?id=' + encodeURIComponent(resEventNumber);
+}
+
+/** Public FDA MAUDE page for an adverse event report (report number with dashes removed). */
+export function adverseEventDetailUrl(reportNumber: string): string | null {
+  if (!reportNumber || reportNumber === 'N/A') return null;
+  return 'https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfMAUDE/detail.cfm?mdrfoi__id=' + encodeURIComponent(reportNumber.replace(/-/g, ''));
+}
+
 interface FdaResponse<T> {
   results?: T[];
   meta?: { results?: { total?: number } };
@@ -66,25 +78,33 @@ async function fetchFda<T>(url: string): Promise<FdaResponse<T>> {
 function formatRecalls(response: FdaResponse<RecallResult>) {
   return {
     total: response.meta?.results?.total || 0,
-    results: (response.results || []).map(r => ({
-      product: (r.product_description || 'N/A').substring(0, 200),
-      reason: (r.reason_for_recall || 'N/A').substring(0, 300),
-      rootCause: r.root_cause_description || 'N/A', status: r.recall_status || 'N/A',
-      date: r.event_date_posted || 'N/A', firm: r.recalling_firm || 'N/A', eventNumber: r.res_event_number || 'N/A',
-    })),
+    results: (response.results || []).map(r => {
+      const eventNumber = r.res_event_number || 'N/A';
+      return {
+        product: (r.product_description || 'N/A').substring(0, 200),
+        reason: (r.reason_for_recall || 'N/A').substring(0, 300),
+        rootCause: r.root_cause_description || 'N/A', status: r.recall_status || 'N/A',
+        date: r.event_date_posted || 'N/A', firm: r.recalling_firm || 'N/A', eventNumber,
+        url: recallDetailUrl(eventNumber),
+      };
+    }),
   };
 }
 
 function formatEvents(response: FdaResponse<AdverseEventResult>) {
   return {
     total: response.meta?.results?.total || 0,
-    results: (response.results || []).map(e => ({
-      eventType: e.event_type || 'N/A', reportNumber: e.report_number || 'N/A', dateReceived: e.date_received || 'N/A',
-      deviceName: e.device?.[0]?.brand_name || 'N/A', deviceGeneric: e.device?.[0]?.generic_name || 'N/A',
-      problems: (e.product_problems || []).join(', ') || 'N/A',
-      patientImpact: (e.patient?.[0]?.patient_problems || []).join(', ') || 'N/A',
-      description: (e.mdr_text?.find(t => t.text_type_code === 'Description of Event or Problem')?.text || '').substring(0, 400),
-    })),
+    results: (response.results || []).map(e => {
+      const reportNumber = e.report_number || 'N/A';
+      return {
+        eventType: e.event_type || 'N/A', reportNumber, dateReceived: e.date_received || 'N/A',
+        deviceName: e.device?.[0]?.brand_name || 'N/A', deviceGeneric: e.device?.[0]?.generic_name || 'N/A',
+        problems: (e.product_problems || []).join(', ') || 'N/A',
+        patientImpact: (e.patient?.[0]?.patient_problems || []).join(', ') || 'N/A',
+        description: (e.mdr_text?.find(t => t.text_type_code === 'Description of Event or Problem')?.text || '').substring(0, 400),
+        url: adverseEventDetailUrl(reportNumber),
+      };
+    }),
   };
 }
 
@@ -174,7 +194,7 @@ export async function getRegulatoryData(company: string, deviceName: string): Pr
       total: warningLetters.length,
       searchUrl: fdaWlSearchUrl,
       note: warningLetters.length > 0
-        ? 'FDA Warning Letters fetched live from FDA.gov. Click a letter to view the full text on FDA.gov.'
+        ? 'FDA Warning Letters fetched live from FDA.gov. Open each letter on FDA.gov via the company listing link.'
         : 'No warning letters found for this company in FDA records.',
     },
   };
