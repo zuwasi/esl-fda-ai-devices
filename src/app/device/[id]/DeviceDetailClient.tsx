@@ -5,6 +5,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import RegulatoryConcerns from '@/components/RegulatoryConcerns';
 import type { CyberEvidence, RiskClassification, DeviceRecord } from '@/lib/types';
+import type { JevAnalysisResult } from '@/lib/jevAnalysis';
 
 interface DeviceDetailClientProps {
   id: string;
@@ -19,6 +20,29 @@ export default function DeviceDetailClient({ id, data }: DeviceDetailClientProps
     cyber: CyberEvidence; pdfTextLength: number; snippets: string[]; warning?: string;
   } | null>(null);
   const [pdfError, setPdfError] = useState('');
+
+  const [jevAnalyzing, setJevAnalyzing] = useState(false);
+  const [jevResult, setJevResult] = useState<JevAnalysisResult | null>(null);
+  const [jevError, setJevError] = useState('');
+
+  async function analyzeWithJev() {
+    if (!data.record.summary_pdf_link?.startsWith('http')) return;
+    setJevAnalyzing(true);
+    setJevError('');
+    setJevResult(null);
+    try {
+      const res = await fetch('/api/jev-analysis?id=' + encodeURIComponent(id));
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Analysis failed');
+      }
+      setJevResult(await res.json());
+    } catch (e) {
+      setJevError(e instanceof Error ? e.message : 'Analysis failed');
+    } finally {
+      setJevAnalyzing(false);
+    }
+  }
 
   async function analyzePdf() {
     if (!data.record.summary_pdf_link?.startsWith('http')) return;
@@ -100,6 +124,76 @@ export default function DeviceDetailClient({ id, data }: DeviceDetailClientProps
                 <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{r.summary}</p>
               </Section>
             )}
+
+            {/* AI Regulatory Concerns (Jev) */}
+            <Section
+              title="AI Regulatory Concerns"
+              badge={
+                <a href="https://typesafe.ai/blog/introducing-system-one-models-and-jev" target="_blank" rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-600 font-medium hover:bg-blue-100">
+                  Powered by
+                  <img src="/jev-badge.png" alt="Jev by TypeSafe AI" className="h-6 rounded" />
+                </a>
+              }
+            >
+              {!jevResult && (
+                <p className="text-xs text-gray-400 mb-3">
+                  Jev reads the full FDA letter and returns calibrated concern probabilities per regulatory category. These are AI estimates, not regulatory advice.
+                </p>
+              )}
+              {jevResult ? (
+                <div className="space-y-3">
+                  {jevResult.regulatoryComplexity && (
+                    <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                      <span className="text-sm font-medium">Regulatory Complexity</span>
+                      <span className="text-sm font-bold text-blue-700">{jevResult.regulatoryComplexity.level}/5</span>
+                    </div>
+                  )}
+                  <div className="text-xs text-gray-400">
+                    Analyzed {jevResult.analyzedCharacters.toLocaleString()} characters of the FDA letter · model {jevResult.model}
+                  </div>
+                  {jevResult.concerns.map((c) => {
+                    const pct = Math.round(c.probability * 100);
+                    const color = c.probability >= 0.7 ? '#dc2626' : c.probability >= 0.4 ? '#f97316' : '#9ca3af';
+                    return (
+                      <div key={c.key} className="space-y-1">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="font-medium text-gray-700">{c.label}</span>
+                          <span className="font-bold" style={{ color }}>{pct}%</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-1.5">
+                          <div className="h-1.5 rounded-full" style={{ width: pct + '%', background: color }} />
+                        </div>
+                        {c.probability >= 0.4 && (
+                          <p className="text-xs text-gray-500">{c.description}</p>
+                        )}
+                      </div>
+                    );
+                  })}
+                  <p className="text-xs text-gray-400 pt-2 border-t border-gray-100">
+                    Higher percentages mean the letter shows more evidence of that concern category. Connect the top concerns to ESL remediation: <a href="https://eswlab.com/contact-us/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">request a scoping workshop</a>.
+                  </p>
+                </div>
+              ) : (
+                <button
+                  onClick={analyzeWithJev}
+                  disabled={jevAnalyzing}
+                  className="w-full py-2.5 text-sm font-semibold text-blue-700 border border-blue-200 rounded-lg hover:bg-blue-50 disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {jevAnalyzing ? (
+                    <>
+                      <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+                      Jev is reading the FDA letter...
+                    </>
+                  ) : (
+                    <>Analyze FDA Letter with Jev</>
+                  )}
+                </button>
+              )}
+              {jevError && (
+                <p className="text-xs text-red-500 mt-2">AI analysis failed: {jevError}</p>
+              )}
+            </Section>
 
             {/* Keywords */}
             {r.summary_keywords && (

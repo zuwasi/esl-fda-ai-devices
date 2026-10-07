@@ -1,16 +1,11 @@
 import { NextResponse } from 'next/server';
-import { PDFParse } from 'pdf-parse';
 import { analyzeCyberEvidenceFromText } from '@/lib/cyberAnalysis';
+import { fetchPdfText } from '@/lib/pdfText';
 import { rateLimit } from '@/lib/rateLimit';
 import type { DeviceRecord } from '@/lib/types';
 import { parse } from 'csv-parse/sync';
 import fs from 'fs';
 import path from 'path';
-import { pathToFileURL } from 'url';
-
-// Set pdf.js worker to the bundled worker file (required for Node.js / Next.js server)
-const workerPath = path.join(process.cwd(), 'node_modules', 'pdf-parse', 'dist', 'worker', 'pdf.worker.mjs');
-PDFParse.setWorker(pathToFileURL(workerPath).href);
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
@@ -28,41 +23,6 @@ async function loadRecords(): Promise<Record<string, DeviceRecord>> {
   }
   recordsCache = records;
   return records;
-}
-
-const PDF_TEXT_CACHE = new Map<string, { text: string; timestamp: number }>();
-const PDF_TEXT_CACHE_MAX = 200; // bound memory from attacker-varied ids
-const CACHE_TTL = 1000 * 60 * 60 * 24; // 24 hours
-
-async function fetchPdfText(pdfUrl: string): Promise<string> {
-  const cached = PDF_TEXT_CACHE.get(pdfUrl);
-  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-    return cached.text;
-  }
-
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 15000);
-
-  try {
-    const response = await fetch(pdfUrl, {
-      signal: controller.signal,
-      headers: { 'User-Agent': 'ESL-FDA-AI-Device-Intelligence/1.0' },
-    });
-    if (!response.ok) throw new Error('PDF fetch failed: ' + response.status);
-    const arrayBuffer = await response.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    const parser = new PDFParse({ data: buffer });
-    const data = await parser.getText();
-    const text = data.text || '';
-    if (PDF_TEXT_CACHE.size >= PDF_TEXT_CACHE_MAX) {
-      const oldest = PDF_TEXT_CACHE.keys().next().value;
-      if (oldest !== undefined) PDF_TEXT_CACHE.delete(oldest);
-    }
-    PDF_TEXT_CACHE.set(pdfUrl, { text, timestamp: Date.now() });
-    return text;
-  } finally {
-    clearTimeout(timeout);
-  }
 }
 
 export async function GET(req: Request) {

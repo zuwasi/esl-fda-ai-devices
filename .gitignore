@@ -12,6 +12,7 @@ yarn-debug.log*
 yarn-error.log*
 .env*.local
 .env
+api/jev_analyses.checkpoint.jsonl
 .vercel
 *.tsbuildinfo
 next-env.d.ts
