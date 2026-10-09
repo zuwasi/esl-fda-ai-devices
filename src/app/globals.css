@@ -159,11 +159,13 @@ a, button { transition: all 0.15s ease; }
 .dark .border-blue-200 { border-color: #1c3d61; }
 .dark .border-blue-300 { border-color: #32455a; }
 
-/* theme toggle: show the sun in dark mode and the moon in light mode */
+/* theme toggle: show the labeled sun in dark mode and the moon in light mode */
 .theme-toggle .theme-toggle-sun { display: none; }
 .theme-toggle .theme-toggle-moon { display: block; }
 .dark .theme-toggle .theme-toggle-sun { display: block; }
 .dark .theme-toggle .theme-toggle-moon { display: none; }
+.theme-toggle .theme-toggle-sun-label { display: none; }
+.dark .theme-toggle .theme-toggle-sun-label { display: inline; }
 
 /* dark form controls (inputs have no explicit bg/text classes in the app) */
 .dark input, .dark select, .dark textarea { background-color: #0d141c; color: #eaf1f8; }

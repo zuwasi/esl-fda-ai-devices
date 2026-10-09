@@ -3,8 +3,8 @@ import './globals.css';
 
 const SITE_URL = 'https://esl-fda.io';
 
-/** Applies the saved (or system) theme before first paint to avoid a flash of the wrong theme. */
-const themeInitScript = `(function(){try{var t=localStorage.getItem('theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');}}catch(e){}})();`;
+/** Applies the saved theme before first paint. Dark is the default; light only if the visitor chose it. */
+const themeInitScript = `(function(){try{var t=localStorage.getItem('theme');if(t!=='light'){document.documentElement.classList.add('dark');}}catch(e){document.documentElement.classList.add('dark');}})();`;
 
 const structuredData = {
   '@context': 'https://schema.org',
