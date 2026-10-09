@@ -61,7 +61,7 @@ export default function Home() {
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
             <div className="relative overflow-hidden bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 text-white rounded-2xl">
               <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 25% 50%, white 2px, transparent 2px)', backgroundSize: '40px 40px' }} />
-              <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-10 pb-16 sm:pb-20 text-center">
+              <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-10 pb-8 sm:pb-10 text-center">
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur text-base mb-5">
                   <span className="w-2.5 h-2.5 rounded-full bg-green-400 animate-pulse" />
                   {totalCount.toLocaleString()} FDA-Authorized AI Devices Indexed
@@ -80,7 +80,7 @@ export default function Home() {
         )}
 
         {/* Search Section */}
-        <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 ${!searched ? '-mt-8 sm:-mt-12' : 'mt-6'}`}>
+        <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 ${!searched ? 'mt-5' : 'mt-6'}`}>
           <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 sm:p-8">
             <form onSubmit={handleSearch} className="space-y-4">
               <div className="flex flex-col sm:flex-row gap-3">
