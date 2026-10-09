@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Class-based dark mode: the <html> element gets .dark from the theme toggle
+   (see ThemeToggle.tsx and the init script in app/layout.tsx). */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* ESL brochure palette applied site-wide (Tailwind 4 theme overrides).
    Source: ESL_Unit_Testing_and_Code_Coverage_Brochure.html :root variables. */
 @theme {
@@ -81,3 +85,91 @@ a, button { transition: all 0.15s ease; }
 /* Banner crossfade */
 @keyframes bannerSwap { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 .banner-swap { animation: bannerSwap 0.4s ease; }
+
+/* ---------- Dark theme ----------
+   Strategy: under .dark, invert the neutral scale (gray-50 becomes a dark
+   surface, gray-900 becomes light text) and flip the paired background/text
+   shades of red, green, and amber. Blue stays as the brand color for gradient
+   cards and badges; blue text and light-blue chips get targeted overrides
+   below. --color-white doubles as the card surface, so text-white is restored
+   to pure white. */
+.dark {
+  color-scheme: dark;
+
+  /* inherited body ink and muted tokens (body { color: var(--esl-ink) }) */
+  --esl-ink: #eaf1f8;
+  --esl-muted: #8ba0b3;
+  --esl-primary: #7db4e8;
+  --esl-secondary: #a4c9f0;
+
+  /* neutrals: inverted */
+  --color-gray-50: #0d141c;
+  --color-gray-100: #131e2a;
+  --color-gray-200: #1d2c3b;
+  --color-gray-300: #32455a;
+  --color-gray-400: #5f7488;
+  --color-gray-500: #8ba0b3;
+  --color-gray-600: #a5b8ca;
+  --color-gray-700: #bfd0e0;
+  --color-gray-800: #d7e3ee;
+  --color-gray-900: #eaf1f8;
+
+  /* white = card surface in dark mode */
+  --color-white: #101a25;
+
+  /* amber (banner, accents) */
+  --color-amber-50: #2a2210;
+  --color-amber-100: #3d3110;
+  --color-amber-200: #544510;
+  --color-amber-800: #ecc86a;
+
+  /* red panels (case studies "Before ESL", error states) */
+  --color-red-50: #2a1518;
+  --color-red-100: #3a1c20;
+  --color-red-200: #4d2830;
+  --color-red-700: #f0a5a8;
+  --color-red-800: #f2b8ba;
+  --color-red-900: #f5cacc;
+
+  /* green panels (case studies "After ESL", verified badges) */
+  --color-green-50: #12241a;
+  --color-green-100: #1a3527;
+  --color-green-200: #244734;
+  --color-green-700: #9fdcb0;
+  --color-green-800: #b8e6c4;
+  --color-green-900: #cfeed6;
+}
+
+/* text-white must stay pure white even though white is the card surface */
+.dark .text-white { color: #ffffff; }
+
+/* blue text on dark surfaces: lighten, leaving blue backgrounds (gradient
+   cards, solid badges) on the brand palette */
+.dark .text-blue-600 { color: #8fbff0; }
+.dark .text-blue-700 { color: #a4c9f0; }
+.dark .text-blue-800 { color: #bcd9f5; }
+.dark .text-blue-900 { color: #d6e6f8; }
+.dark .hover\:text-blue-900:hover { color: #d6e6f8; }
+
+/* light-blue chips and hover fills become dark surfaces */
+.dark .bg-blue-50 { background-color: #12233a; }
+.dark .bg-blue-100 { background-color: #16304e; }
+.dark .bg-blue-200 { background-color: #1c3d61; }
+.dark .hover\:bg-blue-50:hover { background-color: #16304e; }
+.dark .border-blue-200 { border-color: #1c3d61; }
+.dark .border-blue-300 { border-color: #32455a; }
+
+/* theme toggle: show the sun in dark mode and the moon in light mode */
+.theme-toggle .theme-toggle-sun { display: none; }
+.theme-toggle .theme-toggle-moon { display: block; }
+.dark .theme-toggle .theme-toggle-sun { display: block; }
+.dark .theme-toggle .theme-toggle-moon { display: none; }
+
+/* dark form controls (inputs have no explicit bg/text classes in the app) */
+.dark input, .dark select, .dark textarea { background-color: #0d141c; color: #eaf1f8; }
+.dark input::placeholder, .dark textarea::placeholder { color: #6d8296; }
+
+/* dark scrollbar */
+.dark ::-webkit-scrollbar-track { background: #0d141c; }
+.dark ::-webkit-scrollbar-thumb { background: #1d2c3b; }
+.dark ::-webkit-scrollbar-thumb:hover { background: #32455a; }

@@ -1,43 +1,25 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { articles } from '@/lib/articles';
 
-const FDA_DISCUSSION_URL =
-  'https://www.fda.gov/medical-devices/digital-health-center-excellence/considerations-regulation-generative-ai-enabled-medical-devices-discussion-paper-and-request';
-
-const CASE_STUDY_URL = '/case-studies/unit-testing-code-coverage';
-
-const FLASHES = [
-  {
-    label: 'Breaking',
-    text: (
-      <>
-        FDA seeks feedback on regulating <strong>Generative AI-enabled medical devices</strong> - public
-        comments open through Oct 19, 2026.{' '}
-        <a
-          href={FDA_DISCUSSION_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="font-bold text-blue-700 underline whitespace-nowrap hover:text-blue-900"
-        >
-          Read more &rarr;
-        </a>
-      </>
-    ),
-  },
-  {
-    label: 'New Brief',
-    text: (
-      <>
-        New ESL executive brief: <strong>Static Code Analysis Alone Is Not Enough</strong> - adding unit
-        testing &amp; code coverage, built on seven FDA enforcement cases.{' '}
-        <a href={CASE_STUDY_URL} className="font-bold text-blue-700 underline whitespace-nowrap hover:text-blue-900">
-          Read more &rarr;
-        </a>
-      </>
-    ),
-  },
-];
+/** The banner always shows the three newest articles. */
+const FLASHES = articles.slice(0, 3).map(a => ({
+  label: a.source,
+  text: (
+    <>
+      <strong>{a.title}</strong> - {a.summary.length > 140 ? a.summary.slice(0, 140) + '…' : a.summary}{' '}
+      <a
+        href={a.url}
+        target={a.external ? '_blank' : undefined}
+        rel={a.external ? 'noopener noreferrer' : undefined}
+        className="font-bold text-blue-700 underline whitespace-nowrap hover:text-blue-900"
+      >
+        Read more &rarr;
+      </a>
+    </>
+  ),
+}));
 
 export default function BreakingBanner() {
   const [index, setIndex] = useState(0);
@@ -45,9 +27,11 @@ export default function BreakingBanner() {
   useEffect(() => {
     const timer = setInterval(() => {
       setIndex(i => (i + 1) % FLASHES.length);
-    }, 3000);
+    }, 5000);
     return () => clearInterval(timer);
   }, []);
+
+  if (FLASHES.length === 0) return null;
 
   const flash = FLASHES[index];
 
@@ -68,6 +52,12 @@ export default function BreakingBanner() {
         <span key={index} className="text-sm font-medium banner-swap">
           {flash.text}
         </span>
+        <a
+          href="/articles"
+          className="ml-auto text-xs font-semibold text-blue-700 underline whitespace-nowrap hover:text-blue-900"
+        >
+          All articles
+        </a>
       </div>
     </div>
   );

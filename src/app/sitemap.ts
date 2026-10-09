@@ -20,6 +20,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: SITE_URL + '/search', lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.9 },
     { url: SITE_URL + '/about', lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.8 },
     { url: SITE_URL + '/case-studies', lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.6 },
+    { url: SITE_URL + '/articles', lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.7 },
     ...['unit-testing-code-coverage', ...caseStudies.map(cs => cs.id)].map((id) => ({
       url: SITE_URL + '/case-studies/' + id,
       lastModified: new Date(),

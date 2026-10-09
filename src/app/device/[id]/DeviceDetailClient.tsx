@@ -235,7 +235,7 @@ export default function DeviceDetailClient({ id, data }: DeviceDetailClientProps
             {/* Risk Classification */}
             <Section title="Risk Classification" badge="ESL Analysis">
               <div className="space-y-3">
-                <div className="flex justify-between items-center p-3 rounded-lg" style={{ background: risk.iec62304Class === 'C' ? '#fee2e2' : risk.iec62304Class === 'B' ? '#fef9c3' : '#dcfce7' }}>
+                <div className={`flex justify-between items-center p-3 rounded-lg ${risk.iec62304Class === 'C' ? 'bg-red-100' : risk.iec62304Class === 'B' ? 'bg-amber-100' : 'bg-green-100'}`}>
                   <a href="https://www.parasoft.com/blog/what-is-iec-62304-how-is-it-used-in-medical-device-compliance/" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-blue-600 hover:underline">IEC 62304 Class</a>
                   <span className="text-lg font-bold">{risk.iec62304Class}</span>
                 </div>

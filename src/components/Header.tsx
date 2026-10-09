@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import BreakingBanner from '@/components/BreakingBanner';
+import ThemeToggle from '@/components/ThemeToggle';
 
 export default function Header() {
   return (
@@ -33,7 +34,9 @@ export default function Header() {
               <a href="/" className="text-sm font-medium text-gray-600 hover:text-blue-700 px-3 py-2 rounded">Search</a>
               <a href="/assessment" className="text-sm font-medium text-gray-600 hover:text-blue-700 px-3 py-2 rounded">Assessment</a>
               <a href="/case-studies" className="text-sm font-medium text-gray-600 hover:text-blue-700 px-3 py-2 rounded">Case Studies</a>
+              <a href="/articles" className="text-sm font-medium text-gray-600 hover:text-blue-700 px-3 py-2 rounded">Articles</a>
               <a href="/about" className="text-sm font-medium text-gray-600 hover:text-blue-700 px-3 py-2 rounded">About</a>
+              <ThemeToggle />
               <a href="https://eswlab.com/contact-us/" target="_blank" rel="noopener noreferrer" className="hidden sm:inline-flex items-center gap-2 text-sm font-semibold text-white px-4 py-2 rounded-lg" style={{ background: 'linear-gradient(135deg, #0b4c8a, #1a6cb0)' }}>
                 <Image
                   src="/esl-icon.png"

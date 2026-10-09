@@ -3,6 +3,9 @@ import './globals.css';
 
 const SITE_URL = 'https://esl-fda.io';
 
+/** Applies the saved (or system) theme before first paint to avoid a flash of the wrong theme. */
+const themeInitScript = `(function(){try{var t=localStorage.getItem('theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');}}catch(e){}})();`;
+
 const structuredData = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -68,7 +71,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body className="min-h-screen bg-gray-50 text-gray-900 antialiased">
         <script
           id="site-jsonld"
