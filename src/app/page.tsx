@@ -58,18 +58,18 @@ export default function Home() {
       <main className="min-h-screen">
         {/* Hero */}
         {!searched && (
-          <div className="relative overflow-hidden bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 text-white">
-            <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 25% 50%, white 2px, transparent 2px)', backgroundSize: '40px 40px' }} />
-            <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
-              <div className="text-center max-w-3xl mx-auto">
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur text-sm mb-6">
-                  <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+            <div className="relative overflow-hidden bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 text-white rounded-2xl">
+              <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 25% 50%, white 2px, transparent 2px)', backgroundSize: '40px 40px' }} />
+              <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-10 pb-16 sm:pb-20 text-center">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur text-base mb-5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-green-400 animate-pulse" />
                   {totalCount.toLocaleString()} FDA-Authorized AI Devices Indexed
                 </div>
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-5 leading-tight">
                   Search. Assess. Prepare. Submit.
                 </h1>
-                <p className="text-lg sm:text-xl text-blue-100 mb-8">
+                <p className="text-base sm:text-lg text-blue-100 mb-4">
                   The only free public platform that combines semantic search of every FDA-authorized AI medical device
                   with live regulatory risk monitoring - recalls, adverse events, and warning letters - plus cybersecurity
                   evidence analysis and IEC 62304 risk classification.
