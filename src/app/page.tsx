@@ -11,6 +11,8 @@ export default function Home() {
   const [mode, setMode] = useState<'embedding' | 'keyword'>('embedding');
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<any[]>([]);
+  const [concernResults, setConcernResults] = useState<any[]>([]);
+  const [concernTotal, setConcernTotal] = useState(0);
   const [searched, setSearched] = useState(false);
   const [aiInfo, setAiInfo] = useState<AiInfoData | null>(null);
   const [totalCount, setTotalCount] = useState(0);
@@ -34,6 +36,9 @@ export default function Home() {
     if (!query.trim() && !hasActiveFilters) return;
     setLoading(true);
     setSearched(true);
+    const concernsFetch = query.trim()
+      ? fetch('/api/search/concerns?q=' + encodeURIComponent(query.trim())).then(r => r.json()).catch(() => null)
+      : Promise.resolve(null);
     try {
       const searchMode = query.trim() ? mode : 'keyword';
       const res = await fetch('/api/search', {
@@ -50,6 +55,18 @@ export default function Home() {
       }
     } catch {
       setResults([]);
+    }
+    try {
+      const c = await concernsFetch;
+      if (c && c.available) {
+        setConcernResults(c.results || []);
+        setConcernTotal(c.totalIndexed || 0);
+      } else {
+        setConcernResults([]);
+        setConcernTotal(0);
+      }
+    } catch {
+      setConcernResults([]);
     }
     setLoading(false);
   }
@@ -192,7 +209,7 @@ export default function Home() {
               <div className="space-y-3">
                 {[1,2,3].map(i => <div key={i} className="h-32 bg-gray-100 rounded-xl animate-pulse" />)}
               </div>
-            ) : results.length === 0 ? (
+            ) : results.length === 0 && concernResults.length === 0 ? (
               <div className="text-center py-12 text-gray-500">
                 <p className="text-lg">No devices found. Try a different query or switch to AI Semantic Search.</p>
               </div>
@@ -233,6 +250,52 @@ export default function Home() {
                     </div>
                   </a>
                 ))}
+              </div>
+            )}
+
+            {/* Devices with regulatory concerns (FDA recalls, non-AI index) */}
+            {!loading && concernResults.length > 0 && (
+              <div className="mt-8">
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-lg font-semibold text-gray-900">
+                    Devices with regulatory concerns
+                    <span className="ml-2 text-xs font-normal text-gray-500">{concernResults.length} {concernResults.length === 1 ? 'match' : 'matches'} from {concernTotal.toLocaleString()} recalled devices (openFDA)</span>
+                  </h2>
+                </div>
+                <div className="space-y-3">
+                  {concernResults.map(c => (
+                    <a key={c.id} href={c.link} className="block bg-white rounded-xl border border-red-100 p-5 card-hover">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-3 mb-1">
+                            <h3 className="text-lg font-semibold text-gray-900 truncate">{c.device}</h3>
+                            {c.aiLinked?.length > 0 && (
+                              <span className="text-xs px-2 py-0.5 rounded-full font-semibold bg-blue-100 text-blue-700">AI device recall</span>
+                            )}
+                            {c.openRecalls > 0 ? (
+                              <span className="text-xs px-2 py-0.5 rounded-full font-semibold bg-red-600 text-white">{c.openRecalls} open</span>
+                            ) : (
+                              <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-gray-100 text-gray-600">Terminated</span>
+                            )}
+                          </div>
+                          <p className="text-sm text-gray-600">{c.firm} • {c.recallCount} recall{c.recallCount === 1 ? '' : 's'} since 2016{c.latestDate ? ' • latest ' + c.latestDate : ''}</p>
+                          {c.topReasons?.length > 0 && <p className="text-sm text-gray-500 mt-2 line-clamp-2">{c.topReasons.join(' | ')}</p>}
+                          {c.aiLinked?.length > 0 && (
+                            <div className="flex gap-2 mt-2">
+                              {c.aiLinked.map((k: string) => (
+                                <span key={k} className="text-xs text-blue-600">FDA submission: {k}</span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        <div className="text-right shrink-0">
+                          <div className="text-sm font-semibold text-red-600">Recalled</div>
+                          <div className="text-xs text-gray-400">FDA record</div>
+                        </div>
+                      </div>
+                    </a>
+                  ))}
+                </div>
               </div>
             )}
           </div>
