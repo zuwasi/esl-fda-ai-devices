@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import CompanyTypeahead from '@/components/CompanyTypeahead';
+import AiInfoModal, { AiInfoData } from '@/components/AiInfoModal';
 
 export default function SearchPage() {
   const [query, setQuery] = useState('');
@@ -11,6 +12,7 @@ export default function SearchPage() {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<any[]>([]);
   const [searched, setSearched] = useState(false);
+  const [aiInfo, setAiInfo] = useState<AiInfoData | null>(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [totalRecords, setTotalRecords] = useState(0);
@@ -151,6 +153,18 @@ export default function SearchPage() {
                         </div>
                         <p className="text-sm text-gray-600">{r.applicant} • {r.panel} • {r.regulatoryPathway} • {r.decisionDate}</p>
                         <p className="text-sm text-gray-500 mt-2 line-clamp-2">{r.thesis}</p>
+                        <button
+                          onClick={e => { e.preventDefault(); e.stopPropagation(); setAiInfo({
+                            submissionNumber: r.submissionNumber, deviceName: r.deviceName, applicant: r.applicant,
+                            panel: r.panel, regulatoryPathway: r.regulatoryPathway, decisionDate: r.decisionDate,
+                            aiFunction: r.aiFunction, clinicalFunction: r.clinicalFunction, dataType: r.dataType,
+                            riskClass: r.riskClass, thesis: r.thesis,
+                          }); }}
+                          className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 border border-blue-200 rounded-lg px-3 py-1.5 hover:bg-blue-50"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
+                          How is AI used?
+                        </button>
                       </div>
                       {r.similarity > 0 && (
                         <div className="text-right shrink-0">
@@ -176,6 +190,7 @@ export default function SearchPage() {
           </div>
         </div>
       </main>
+      {aiInfo && <AiInfoModal info={aiInfo} onClose={() => setAiInfo(null)} />}
       <Footer />
     </div>
   );

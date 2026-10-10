@@ -171,6 +171,11 @@ a, button { transition: all 0.15s ease; }
 .dark input, .dark select, .dark textarea { background-color: #0d141c; color: #eaf1f8; }
 .dark input::placeholder, .dark textarea::placeholder { color: #6d8296; }
 
+/* Regulatory Concerns button: quick attention flash while real concerns exist */
+@keyframes concernFlash { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+.concern-flash { animation: concernFlash 0.7s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .concern-flash { animation: none; } }
+
 /* dark scrollbar */
 .dark ::-webkit-scrollbar-track { background: #0d141c; }
 .dark ::-webkit-scrollbar-thumb { background: #1d2c3b; }

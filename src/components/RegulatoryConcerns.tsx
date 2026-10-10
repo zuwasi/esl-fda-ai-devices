@@ -85,15 +85,20 @@ export default function RegulatoryConcerns({ company, deviceName }: { company: s
   const wlCount = data?.warningLetters.total || 0;
   const deviceTotal = (data?.deviceSpecific.recalls.total || 0) + (data?.deviceSpecific.adverseEvents.total || 0);
   const totalWithWL = deviceTotal + wlCount;
+  // Real concerns confirmed by FDA data: any device-specific or company-wide recall/adverse event, or a warning letter.
+  const hasRealConcerns = !!data && (
+    totalWithWL > 0 ||
+    (data.companyWide?.recalls.total || 0) + (data.companyWide?.adverseEvents.total || 0) > 0
+  );
   const encodedCompany = encodeURIComponent(JSON.stringify(primaryCompanyName(company)));
   const encodedDevice = encodeURIComponent(JSON.stringify(deviceSearchKeywords(deviceName)));
   const recallSearch = 'https://api.fda.gov/device/recall.json?search=recalling_firm:' + encodedCompany + (scope === 'device' ? '+AND+product_description:' + encodedDevice : '') + '&limit=100';
   const eventSearch = 'https://api.fda.gov/device/event.json?search=device.manufacturer_d_name:' + encodedCompany + (scope === 'device' ? '+AND+device.brand_name:' + encodedDevice : '') + '&limit=100';
 
   return <>
-    <button onClick={handleClick} className={'inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors' + ''}>
+    <button onClick={handleClick} title={hasRealConcerns ? 'FDA records show recalls, adverse events, or warning letters for this device or its manufacturer' : undefined} className={'inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors ' + (hasRealConcerns ? 'concern-flash bg-green-600 text-white border border-green-600 hover:bg-green-700' : 'text-red-600 border border-red-200 hover:bg-red-50')}>
       <WarningIcon className={'w-4 h-4' + ''} /> Regulatory Concerns
-      {data && totalWithWL > 0 && <span className={'px-1.5 py-0.5 text-xs rounded-full bg-red-100 text-red-700 font-bold' + ''}>{totalWithWL > 999 ? '999+' : totalWithWL}</span>}
+      {data && totalWithWL > 0 && <span className={'px-1.5 py-0.5 text-xs rounded-full bg-white/90 text-red-700 font-bold' + ''}>{totalWithWL > 999 ? '999+' : totalWithWL}</span>}
     </button>
     {open && <div className={'fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50' + ''} onClick={() => setOpen(false)}>
       <div className={'bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[85vh] overflow-hidden flex flex-col' + ''} onClick={event => event.stopPropagation()}>
