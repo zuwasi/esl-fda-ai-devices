@@ -2,42 +2,82 @@ import { NextRequest, NextResponse } from 'next/server';
 import { rateLimit } from '@/lib/rateLimit';
 
 /**
- * Optional real-time metasearch via a SearXNG instance
- * (https://github.com/searxng/searxng). Enable by setting SEARXNG_URL in the
- * environment to the instance base URL, with `search:
- * formats: [html, json]` in the instance's settings.yml so the JSON API is
- * allowed. When unset, the endpoint reports available: false and the UI hides
- * the feature.
+ * Real-time web info about a device, powered by the OpenAI Responses API with
+ * the web search tool. Enable by setting OPENAI_API_KEY in the environment.
+ * Each call runs a live web search and returns a short summary with source
+ * links (web search is billed per search by OpenAI).
  */
+
+interface Citation {
+  url: string;
+  title: string;
+}
+
 export async function GET(req: NextRequest) {
-  const limited = rateLimit(req, 'web-search', 20, 60_000);
+  const limited = rateLimit(req, 'web-search', 10, 60_000);
   if (limited) return limited;
 
-  const searxngUrl = process.env.SEARXNG_URL;
-  const q = req.nextUrl.searchParams.get('q')?.trim().slice(0, 200);
-  if (!searxngUrl || !q) {
-    return NextResponse.json({ available: false, reason: !q ? 'Missing search query.' : 'Live web search is not configured on the server.' });
+  const openAiKey = process.env.OPENAI_API_KEY;
+  const device = req.nextUrl.searchParams.get('device')?.trim().slice(0, 120);
+  const company = req.nextUrl.searchParams.get('company')?.trim().slice(0, 120);
+  const submission = req.nextUrl.searchParams.get('submission')?.trim().slice(0, 40);
+
+  if (!openAiKey) {
+    return NextResponse.json({ available: false, reason: 'Live web search is not configured on the server (missing OPENAI_API_KEY).' });
+  }
+  if (!device || !company) {
+    return NextResponse.json({ available: false, reason: 'Missing device or company.' });
   }
 
+  const prompt = `A visitor is viewing the FDA-authorized AI medical device "${device}" by ${company}`
+    + (submission ? ` (FDA submission ${submission})` : '')
+    + `. Search the live web for authoritative information about this device and its AI: what the AI does, what the device is used for, and any notable public information such as recalls, warnings, or news. Reply with a concise factual summary of 3-4 sentences based on what you find.`;
+
   try {
-    const upstream = await fetch(
-      searxngUrl.replace(/\/+$/, '') + '/search?q=' + encodeURIComponent(q) + '&format=json&language=en',
-      { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(8000) },
-    );
+    const upstream = await fetch('https://api.openai.com/v1/responses', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${openAiKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        tools: [{ type: 'web_search' }],
+        input: prompt,
+      }),
+      signal: AbortSignal.timeout(45_000),
+    });
+
     if (!upstream.ok) {
-      return NextResponse.json({ available: false, reason: `Metasearch instance returned HTTP ${upstream.status} (JSON format may be disabled in its settings).` });
+      if (upstream.status === 401) {
+        return NextResponse.json({ available: false, reason: 'The OpenAI API key configured on the server is invalid or expired.' });
+      }
+      const errText = await upstream.text().catch(() => '');
+      return NextResponse.json({ available: false, reason: `OpenAI returned HTTP ${upstream.status}.` , detail: errText.slice(0, 200) });
     }
+
     const data = await upstream.json();
-    const results = (data.results || [])
-      .slice(0, 5)
-      .map((r: { title?: string; url?: string; content?: string }) => ({
-        title: r.title || r.url || 'Result',
-        url: r.url,
-        snippet: (r.content || '').slice(0, 300),
-      }))
-      .filter((r: { url?: string }) => !!r.url);
-    return NextResponse.json({ available: true, results });
+    const citations: Citation[] = [];
+    let summary = '';
+    for (const item of data.output || []) {
+      if (item.type === 'message') {
+        for (const block of item.content || []) {
+          if (block.type === 'output_text') {
+            summary += block.text || '';
+            for (const ann of block.annotations || []) {
+              if (ann.type === 'url_citation' && ann.url && !citations.some(c => c.url === ann.url)) {
+                citations.push({ url: ann.url, title: ann.title || ann.url });
+              }
+            }
+          }
+        }
+      }
+    }
+    if (!summary.trim()) {
+      return NextResponse.json({ available: false, reason: 'OpenAI returned no summary for this device.' });
+    }
+    // OpenAI inlines citations as markdown links like ([example.com](url)); the
+    // Sources list below already presents them, so drop the inline markers.
+    summary = summary.replace(/\s*\(\s*\[[^\]]+\]\([^)]+\)\s*\)/g, '');
+    return NextResponse.json({ available: true, summary: summary.trim(), sources: citations.slice(0, 8) });
   } catch {
-    return NextResponse.json({ available: false, reason: 'Could not reach the metasearch instance.' });
+    return NextResponse.json({ available: false, reason: 'Could not reach OpenAI. Try again later.' });
   }
 }

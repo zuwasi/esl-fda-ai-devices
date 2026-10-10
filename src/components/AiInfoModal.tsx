@@ -16,10 +16,9 @@ export interface AiInfoData {
   thesis: string;
 }
 
-interface WebResult {
-  title: string;
+interface WebSource {
   url: string;
-  snippet: string;
+  title: string;
 }
 
 type WebState =
@@ -27,7 +26,7 @@ type WebState =
   | { state: 'loading' }
   | { state: 'off'; message: string }
   | { state: 'error' }
-  | { state: 'done'; results: WebResult[] };
+  | { state: 'done'; summary: string; sources: WebSource[] };
 
 export default function AiInfoModal({ info, onClose }: { info: AiInfoData; onClose: () => void }) {
   const [web, setWeb] = useState<WebState>({ state: 'idle' });
@@ -35,11 +34,11 @@ export default function AiInfoModal({ info, onClose }: { info: AiInfoData; onClo
   async function searchWeb() {
     setWeb({ state: 'loading' });
     try {
-      const q = encodeURIComponent(`${info.deviceName} ${info.applicant} FDA AI`);
-      const res = await fetch('/api/web-search?q=' + q);
+      const params = new URLSearchParams({ device: info.deviceName, company: info.applicant, submission: info.submissionNumber });
+      const res = await fetch('/api/web-search?' + params.toString());
       const data = await res.json();
-      if (!data.available) setWeb({ state: 'off', message: data.reason || 'Live web search is not configured on the server.' });
-      else setWeb({ state: 'done', results: data.results || [] });
+      if (!data.available) setWeb({ state: 'off', message: data.reason || 'Live web search is not available.' });
+      else setWeb({ state: 'done', summary: data.summary, sources: data.sources || [] });
     } catch {
       setWeb({ state: 'error' });
     }
@@ -84,25 +83,32 @@ export default function AiInfoModal({ info, onClose }: { info: AiInfoData; onClo
             <h3 className="text-sm font-semibold text-gray-900 mb-1">Live web search (real-time, optional)</h3>
             {web.state === 'idle' && (
               <div>
-                <p className="text-xs text-gray-500 mb-2">Search the open web in real time for more public information about this device and its AI, via the site&apos;s metasearch integration (SearXNG).</p>
+                <p className="text-xs text-gray-500 mb-2">Search the live web in real time for public information about this device and its AI, via OpenAI web search.</p>
                 <button onClick={searchWeb} className="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 border border-blue-200 rounded-lg px-3 py-1.5 hover:bg-blue-50">
                   Search the web for this device
                 </button>
               </div>
             )}
-            {web.state === 'loading' && <p className="text-sm text-gray-500">Searching the web...</p>}
+            {web.state === 'loading' && <p className="text-sm text-gray-500">Searching the live web... (this can take up to half a minute)</p>}
             {web.state === 'off' && <p className="text-xs text-gray-500 italic">{web.message}</p>}
             {web.state === 'error' && <p className="text-sm text-red-600">Live search failed. Try again later.</p>}
-            {web.state === 'done' && (web.results.length
-              ? <ul className="space-y-2">
-                  {web.results.map((r, i) => (
-                    <li key={i} className="text-sm">
-                      <a href={r.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 font-medium hover:underline">{r.title}</a>
-                      <p className="text-xs text-gray-500">{r.snippet}</p>
-                    </li>
-                  ))}
-                </ul>
-              : <p className="text-xs text-gray-500 italic">No web results found for this device.</p>)}
+            {web.state === 'done' && (
+              <div>
+                <p className="text-sm text-gray-600 leading-relaxed">{web.summary}</p>
+                {web.sources.length > 0 && (
+                  <div className="mt-2">
+                    <p className="text-xs font-semibold text-gray-700 mb-1">Sources</p>
+                    <ul className="space-y-1">
+                      {web.sources.map((s, i) => (
+                        <li key={i} className="text-xs">
+                          <a href={s.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline break-all">{s.title}</a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
