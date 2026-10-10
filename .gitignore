@@ -16,3 +16,7 @@ api/jev_analyses.checkpoint.jsonl
 .vercel
 *.tsbuildinfo
 next-env.d.ts
+
+# openFDA bulk download scratch (weekly index workflow)
+bulk/
+recall.zip

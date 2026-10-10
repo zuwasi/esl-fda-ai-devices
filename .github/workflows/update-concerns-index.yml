@@ -1,0 +1,40 @@
+name: Update concerns index
+
+on:
+  schedule:
+    - cron: '0 6 * * 1' # Mondays 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Download openFDA bulk recall export
+        run: |
+          curl -sfL -o recall.zip https://download.open.fda.gov/device/recall/device-recall-0001-of-0001.json.zip
+          unzip -o recall.zip -d bulk
+
+      - name: Build index
+        run: node scripts/buildConcernsIndex.mjs --bulk bulk/device-recall-0001-of-0001.json
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/data/concerns-devices.json
+          if git diff --cached --quiet; then
+            echo "Index unchanged, nothing to commit"
+          else
+            git commit -m "Weekly refresh: rebuild regulatory-concerns index from openFDA"
+            git push
+            echo "Pushed refreshed index; Railway will redeploy automatically"
+          fi
