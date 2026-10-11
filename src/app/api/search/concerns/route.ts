@@ -18,6 +18,10 @@ export interface ConcernGroup {
   worstClass: string | null;
   latestDate: string | null;
   aiLinked?: string[];
+  kNumbers?: string[];
+  productCodes?: string[];
+  feiNumber?: string | null;
+  firmAddress?: string | null;
   recalls: Array<{
     classification: string;
     status: string;
@@ -29,6 +33,9 @@ export interface ConcernGroup {
     quantity: string | null;
     distribution: string | null;
     eventNumber: string | null;
+    action?: string | null;
+    codeInfo?: string | null;
+    country?: string | null;
   }>;
 }
 

@@ -2,6 +2,8 @@ import Link from 'next/link';
 import fs from 'fs/promises';
 import path from 'path';
 import type { Metadata } from 'next';
+import RegulatoryConcerns from '@/components/RegulatoryConcerns';
+import ConcernDeviceInfo from '@/components/ConcernDeviceInfo';
 import type { ConcernGroup } from '@/app/api/search/concerns/route';
 
 export const revalidate = 86400;
@@ -69,16 +71,28 @@ export default async function ConcernDevicePage({ params }: { params: Promise<{ 
       </div>
       <p className="text-gray-600 mt-1">{g.firm} • {g.recallCount} recall{g.recallCount === 1 ? '' : 's'} recorded since 2016{g.latestDate ? ' • latest ' + g.latestDate : ''}</p>
 
+      {(g.firmAddress || g.feiNumber || (g.productCodes && g.productCodes.length > 0)) && (
+        <div className="bg-white rounded-xl border border-gray-200 p-5 grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+          {g.firmAddress && <div><p className="text-xs text-gray-500">Recalling firm address</p><p className="text-sm font-semibold text-gray-900">{g.firmAddress}</p></div>}
+          {g.feiNumber && <div><p className="text-xs text-gray-500">FDA establishment (FEI) number</p><p className="text-sm font-semibold text-gray-900">{g.feiNumber}</p></div>}
+          {g.productCodes && g.productCodes.length > 0 && <div><p className="text-xs text-gray-500">FDA product code{g.productCodes.length > 1 ? 's' : ''}</p><p className="text-sm font-semibold text-gray-900">{g.productCodes.join(', ')}</p></div>}
+        </div>
+      )}
+
       {g.aiLinked && g.aiLinked.length > 0 && (
-        <p className="text-sm mt-3 bg-blue-50 border border-blue-100 rounded-lg px-3 py-2">
+        <p className="text-sm mt-4 bg-blue-50 border border-blue-100 rounded-lg px-3 py-2">
           FDA submission records linked to this recall:{' '}
           {g.aiLinked.map(k => <Link key={k} href={'/device/' + k} className="text-blue-600 font-semibold hover:underline mr-3">{k}</Link>)}
         </p>
       )}
 
-      <p className="text-xs text-gray-500 mt-3 bg-blue-50 border border-blue-100 rounded-lg px-3 py-2">
+      <p className="text-xs text-gray-500 mt-4 bg-blue-50 border border-blue-100 rounded-lg px-3 py-2">
         This device is not in the FDA AI-Enabled Device Index, but it has FDA recall records. It appears on this site through the ESL regulatory-concerns index built from openFDA recall data.
       </p>
+
+      {g.productCodes && g.productCodes.length > 0 && (
+        <ConcernDeviceInfo productCodes={g.productCodes} kNumbers={g.kNumbers || []} aiLinked={g.aiLinked || []} />
+      )}
 
       <h2 className="text-lg font-semibold text-gray-900 mt-8 mb-3">Recall history</h2>
       <div className="space-y-3">
@@ -97,7 +111,15 @@ export default async function ConcernDevicePage({ params }: { params: Promise<{ 
             <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-xs text-gray-500">
               {r.quantity && <span>Quantity: {r.quantity}</span>}
               {r.distribution && <span>Distribution: {r.distribution}</span>}
+              {r.country && <span>Country: {r.country}</span>}
             </div>
+            {r.codeInfo && <p className="text-xs text-gray-500 mt-1">Codes: {r.codeInfo}</p>}
+            {r.action && (
+              <details className="mt-2">
+                <summary className="text-xs font-semibold text-blue-600 cursor-pointer">Corrective action taken by the firm</summary>
+                <p className="text-xs text-gray-600 mt-1 whitespace-pre-line">{r.action}</p>
+              </details>
+            )}
             {r.eventNumber && (
               <a
                 href={'https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfRES/res.cfm?id=' + encodeURIComponent(r.eventNumber)}
@@ -109,6 +131,10 @@ export default async function ConcernDevicePage({ params }: { params: Promise<{ 
             )}
           </div>
         ))}
+      </div>
+
+      <div className="mt-8">
+        <RegulatoryConcerns company={g.firm} deviceName={g.device} />
       </div>
     </div>
   );

@@ -155,6 +155,15 @@ async function buildFromBulkFile(filePath) {
           res_event_number: raw.res_event_number || raw.product_res_number,
           event_id: raw.res_event_number,
           k_numbers: raw.k_numbers || [],
+          action: raw.action,
+          code_info: raw.code_info,
+          country: raw.country,
+          address_1: raw.address_1,
+          city: raw.city,
+          state: raw.state,
+          postal_code: raw.postal_code,
+          firm_fei_number: raw.firm_fei_number,
+          product_code: raw.product_code,
         });
       }
     } catch { /* skip malformed record */ }
@@ -205,6 +214,7 @@ function groupRecords(records, aiNumbers) {
       groups.set(id, {
         id, firm, device, recalls: [], recallCount: 0, openRecalls: 0,
         worstClass: null, latestDate: null, kNumbers: [], aiLinked: [],
+        productCodes: [], feiNumber: null, firmAddress: null,
       });
     }
     const g = groups.get(id);
@@ -217,9 +227,15 @@ function groupRecords(records, aiNumbers) {
     const cls = r.classification || null;
     if (cls && (!g.worstClass || classRank(cls) < classRank(g.worstClass))) g.worstClass = cls;
     for (const k of r.k_numbers || []) {
-      if (g.kNumbers.length < 8 && !g.kNumbers.includes(k)) g.kNumbers.push(k);
+      if (g.kNumbers.length < 5 && !g.kNumbers.includes(k)) g.kNumbers.push(k);
     }
-    if (g.recalls.length < 10) {
+    if (r.product_code && !g.productCodes.includes(r.product_code) && g.productCodes.length < 3) g.productCodes.push(r.product_code);
+    if (r.firm_fei_number && !g.feiNumber) g.feiNumber = String(r.firm_fei_number);
+    if (!g.firmAddress) {
+      const addr = [r.address_1, r.city, r.state, r.postal_code].filter(Boolean).join(', ');
+      if (addr) g.firmAddress = addr.slice(0, 140);
+    }
+    if (g.recalls.length < 5) {
       g.recalls.push({
         classification: cls || 'N/A',
         status,
@@ -227,18 +243,24 @@ function groupRecords(records, aiNumbers) {
         terminated: terminated || null,
         reason: (r.reason_for_recall || 'N/A').slice(0, 300),
         rootCause: (r.root_cause_description || 'N/A').slice(0, 120),
-        product: (r.product_description || '').slice(0, 300),
+        product: (r.product_description || '').slice(0, 400),
         quantity: (r.product_quantity || '').slice(0, 60) || null,
         distribution: (r.distribution_pattern || '').slice(0, 120) || null,
         eventNumber: r.res_event_number || r.event_id || null,
+        action: (r.action || '').slice(0, 500) || null,
+        codeInfo: (r.code_info || '').slice(0, 120) || null,
+        country: (r.country || '').slice(0, 40) || null,
       });
     }
   }
   for (const g of groups.values()) {
     g.recalls.sort((a, b) => (b.initiated || '').localeCompare(a.initiated || ''));
     g.aiLinked = g.kNumbers.filter(k => aiNumbers.has(k)).slice(0, 3);
-    delete g.kNumbers;
     if (!g.aiLinked.length) delete g.aiLinked;
+    if (!g.kNumbers.length) delete g.kNumbers;
+    if (!g.productCodes.length) delete g.productCodes;
+    if (!g.feiNumber) delete g.feiNumber;
+    if (!g.firmAddress) delete g.firmAddress;
     if (!g.worstClass) delete g.worstClass; // bulk export carries no classification field
   }
   return Array.from(groups.values());
