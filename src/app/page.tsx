@@ -9,6 +9,7 @@ import AiInfoModal, { AiInfoData } from '@/components/AiInfoModal';
 export default function Home() {
   const [query, setQuery] = useState('');
   const [mode, setMode] = useState<'embedding' | 'keyword'>('embedding');
+  const [scope, setScope] = useState<'all' | 'concerns'>('all');
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<any[]>([]);
   const [concernResults, setConcernResults] = useState<any[]>([]);
@@ -33,6 +34,27 @@ export default function Home() {
 
   async function handleSearch(e: React.FormEvent) {
     e.preventDefault();
+    if (scope === 'concerns') {
+      // Concerns-only search: skip the AI index entirely.
+      setLoading(true);
+      setSearched(true);
+      setResults([]);
+      setTotalCount(0);
+      try {
+        const c = await fetch('/api/search/concerns?q=' + encodeURIComponent(query.trim())).then(r => r.json());
+        if (c && c.available) {
+          setConcernResults(c.results || []);
+          setConcernTotal(c.totalIndexed || 0);
+        } else {
+          setConcernResults([]);
+          setConcernTotal(0);
+        }
+      } catch {
+        setConcernResults([]);
+      }
+      setLoading(false);
+      return;
+    }
     if (!query.trim() && !hasActiveFilters) return;
     setLoading(true);
     setSearched(true);
@@ -112,7 +134,7 @@ export default function Home() {
                 />
                 <button
                   type="submit"
-                  disabled={loading || (!query.trim() && !hasActiveFilters)}
+                  disabled={loading || (scope === 'all' && !query.trim() && !hasActiveFilters)}
                   className="px-8 py-4 text-white font-semibold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   style={{ background: 'linear-gradient(135deg, #0b4c8a, #1a6cb0)' }}
                 >
@@ -126,14 +148,26 @@ export default function Home() {
               </div>
               <div className="flex items-center gap-4">
                 <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
-                  <input type="radio" name="mode" value="embedding" checked={mode === 'embedding'} onChange={() => setMode('embedding')} className="accent-blue-600" />
+                  <input type="radio" name="mode" value="embedding" checked={mode === 'embedding'} onChange={() => setMode('embedding')} className="accent-blue-600" disabled={scope === 'concerns'} />
                   AI Semantic Search
                 </label>
                 <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
-                  <input type="radio" name="mode" value="keyword" checked={mode === 'keyword'} onChange={() => setMode('keyword')} className="accent-blue-600" />
+                  <input type="radio" name="mode" value="keyword" checked={mode === 'keyword'} onChange={() => setMode('keyword')} className="accent-blue-600" disabled={scope === 'concerns'} />
                   Keyword Search
                 </label>
+                <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer sm:ml-auto">
+                  <input type="radio" name="scope" value="concerns" checked={scope === 'concerns'} onChange={() => setScope('concerns')} className="accent-red-600" />
+                  <span className="font-medium text-red-700">Regulatory concerns only</span>
+                </label>
+                {scope === 'concerns' && (
+                  <button type="button" onClick={() => setScope('all')} className="text-sm text-blue-600 hover:underline">
+                    back to all devices
+                  </button>
+                )}
               </div>
+              {scope === 'concerns' && (
+                <p className="text-xs text-gray-500">Searching {concernTotal ? concernTotal.toLocaleString() : '23,899'} devices with FDA recall records (2016 to today). Filters above apply to AI devices only. Leave the box empty to browse the latest recalls.</p>
+              )}
               <div className="border-t border-gray-200 pt-4">
                 <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
                   <h2 className="text-sm font-semibold text-gray-800">Filter FDA-authorized devices</h2>
@@ -201,7 +235,11 @@ export default function Home() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-semibold text-gray-900">
-                {loading ? 'Searching...' : results.length + ' results'}
+                {loading
+                  ? 'Searching...'
+                  : scope === 'concerns'
+                    ? concernResults.length + ' recalled device' + (concernResults.length === 1 ? '' : 's') + ' found'
+                    : results.length + ' results'}
               </h2>
               <a href="/search" className="text-sm text-blue-600 hover:underline">Full search with filters →</a>
             </div>
@@ -209,7 +247,11 @@ export default function Home() {
               <div className="space-y-3">
                 {[1,2,3].map(i => <div key={i} className="h-32 bg-gray-100 rounded-xl animate-pulse" />)}
               </div>
-            ) : results.length === 0 && concernResults.length === 0 ? (
+            ) : scope === 'concerns' && concernResults.length === 0 ? (
+              <div className="text-center py-12 text-gray-500">
+                <p className="text-lg">No recalled devices matched. Try a device name, company, or leave the box empty to browse the latest recalls.</p>
+              </div>
+            ) : scope === 'concerns' ? null : results.length === 0 && concernResults.length === 0 ? (
               <div className="text-center py-12 text-gray-500">
                 <p className="text-lg">No devices found. Try a different query or switch to AI Semantic Search.</p>
               </div>
