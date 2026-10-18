@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import RiskBadge from '@/components/RiskBadge';
 import CompanyTypeahead from '@/components/CompanyTypeahead';
 import AiInfoModal, { AiInfoData } from '@/components/AiInfoModal';
 
@@ -209,12 +210,3 @@ function FilterSelect({ label, value, options, onChange }: { label: string; valu
   );
 }
 
-function RiskBadge({ cls }: { cls: string }) {
-  const colors: Record<string, string> = { A: '#16a34a', B: '#eab308', C: '#dc2626' };
-  const bgs: Record<string, string> = { A: '#dcfce7', B: '#fef9c3', C: '#fee2e2' };
-  return (
-    <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={{ background: bgs[cls] || '#e5e7eb', color: colors[cls] || '#6b7280' }}>
-      IEC 62304 Class {cls}
-    </span>
-  );
-}
