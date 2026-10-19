@@ -63,11 +63,10 @@ export default function AssessmentPage() {
             <div className="flex items-center gap-2 mb-8">
               {[1,2,3].map(s => (
                 <div key={s} className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold"
-                    style={{ background: step >= s ? '#0b4c8a' : '#e5e7eb', color: step >= s ? 'white' : '#6b7280' }}>
+                  <div className={'w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ' + (step >= s ? 'bg-blue-800 text-white' : 'bg-gray-200 text-gray-500')}>
                     {s}
                   </div>
-                  {s < 3 && <div className="w-12 h-0.5" style={{ background: step > s ? '#0b4c8a' : '#e5e7eb' }} />}
+                  {s < 3 && <div className={'w-12 h-0.5 ' + (step > s ? 'bg-blue-500' : 'bg-gray-200')} />}
                 </div>
               ))}
             </div>
@@ -86,8 +85,7 @@ export default function AssessmentPage() {
                   <div className="grid grid-cols-3 gap-3">
                     {['510(k)', 'De Novo', 'PMA'].map(p => (
                       <button key={p} onClick={() => setState({...state, pathway: p})}
-                        className="px-4 py-3 border rounded-lg text-sm font-medium transition"
-                        style={{ borderColor: state.pathway === p ? '#0b4c8a' : '#d1d5db', background: state.pathway === p ? '#eff6ff' : 'white', color: state.pathway === p ? '#0b4c8a' : '#374151' }}>
+                        className={'px-4 py-3 border rounded-lg text-sm font-medium transition ' + (state.pathway === p ? 'border-blue-500 bg-blue-50 text-blue-800' : 'border-gray-300 bg-white text-gray-700')}>
                         {p}
                       </button>
                     ))}
@@ -102,8 +100,7 @@ export default function AssessmentPage() {
                       { cls: 'C', desc: 'High Risk', color: '#dc2626' },
                     ].map(c => (
                       <button key={c.cls} onClick={() => setState({...state, softwareClass: c.cls})}
-                        className="px-4 py-3 border rounded-lg text-sm font-medium transition text-center"
-                        style={{ borderColor: state.softwareClass === c.cls ? '#0b4c8a' : '#d1d5db', background: state.softwareClass === c.cls ? '#eff6ff' : 'white' }}>
+                        className={'px-4 py-3 border rounded-lg text-sm font-medium transition text-center ' + (state.softwareClass === c.cls ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white')}>
                         <div className="font-bold" style={{ color: c.color }}>Class {c.cls}</div>
                         <div className="text-xs text-gray-500">{c.desc}</div>
                       </button>
@@ -124,14 +121,12 @@ export default function AssessmentPage() {
                 <div className="space-y-3">
                   {evidenceItems.map(item => (
                     <button key={item.key} onClick={() => toggle(item.key)}
-                      className="w-full flex items-center justify-between p-4 border rounded-lg text-left transition"
-                      style={{ borderColor: state[item.key] ? '#16a34a' : '#d1d5db', background: state[item.key] ? '#f0fdf4' : 'white' }}>
+                      className={'w-full flex items-center justify-between p-4 border rounded-lg text-left transition ' + (state[item.key] ? 'border-green-600 bg-green-50' : 'border-gray-300 bg-white')}>
                       <div>
                         <div className="font-medium text-gray-900">{item.label}</div>
                         <div className="text-xs text-gray-500 mt-0.5">{item.standard} • ESL capability: {item.esl}</div>
                       </div>
-                      <div className="w-6 h-6 rounded-full flex items-center justify-center"
-                        style={{ background: state[item.key] ? '#16a34a' : '#e5e7eb' }}>
+                      <div className={'w-6 h-6 rounded-full flex items-center justify-center ' + (state[item.key] ? 'bg-green-600' : 'bg-gray-200')}>
                         {state[item.key] && <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>}
                       </div>
                     </button>
@@ -170,7 +165,7 @@ export default function AssessmentPage() {
               <div className="flex flex-col sm:flex-row items-center gap-6">
                 <div className="relative w-32 h-32">
                   <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 128 128">
-                    <circle cx="64" cy="64" r="56" fill="none" stroke="#e5e7eb" strokeWidth="12" />
+                    <circle cx="64" cy="64" r="56" fill="none" className="stroke-gray-200" strokeWidth="12" />
                     <circle cx="64" cy="64" r="56" fill="none" strokeWidth="12" strokeLinecap="round"
                       stroke={readinessScore >= 80 ? '#16a34a' : readinessScore >= 50 ? '#eab308' : readinessScore >= 25 ? '#f97316' : '#dc2626'}
                       strokeDasharray={2 * Math.PI * 56}
@@ -198,7 +193,7 @@ export default function AssessmentPage() {
               <h3 className="text-lg font-semibold mb-4">Evidence Gap Analysis</h3>
               <div className="space-y-3">
                 {evidenceItems.map(item => (
-                  <div key={item.key} className="flex items-center justify-between p-4 rounded-lg" style={{ background: state[item.key] ? '#f0fdf4' : '#fef2f2' }}>
+                  <div key={item.key} className={'flex items-center justify-between p-4 rounded-lg ' + (state[item.key] ? 'bg-green-50' : 'bg-red-50')}>
                     <div className="flex items-center gap-3">
                       {state[item.key] ?
                         <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center"><span className="text-green-600">✓</span></div> :

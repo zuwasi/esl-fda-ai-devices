@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import RiskBadge from '@/components/RiskBadge';
 import CompanyTypeahead from '@/components/CompanyTypeahead';
 import AiInfoModal, { AiInfoData } from '@/components/AiInfoModal';
 
@@ -105,7 +106,10 @@ export default function Home() {
               <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-10 pb-8 sm:pb-10 text-center">
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur text-base mb-5">
                   <span className="w-2.5 h-2.5 rounded-full bg-green-400 animate-pulse" />
-                  {totalCount.toLocaleString()} FDA-Authorized AI Devices Indexed
+                  {totalCount > 0
+                    ? totalCount.toLocaleString()
+                    : <span aria-hidden="true" className="inline-block w-12 h-4 rounded bg-white/20 animate-pulse motion-reduce:animate-none" />}
+                  {' '}FDA-Authorized AI Devices Indexed
                 </div>
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-5 leading-tight">
                   Search. Assess. Prepare. Submit.
@@ -263,10 +267,7 @@ export default function Home() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-3 mb-1">
                           <h3 className="text-lg font-semibold text-gray-900 truncate">{r.deviceName}</h3>
-                          <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={{
-                            background: r.riskClass === 'C' ? '#fee2e2' : r.riskClass === 'B' ? '#fef9c3' : '#dcfce7',
-                            color: r.riskClass === 'C' ? '#dc2626' : r.riskClass === 'B' ? '#ca8a04' : '#16a34a'
-                          }}>IEC 62304 Class {r.riskClass}</span>
+                          <RiskBadge cls={r.riskClass} />
                         </div>
                         <p className="text-sm text-gray-600">{r.applicant} • {r.panel} • {r.regulatoryPathway} • {r.decisionDate}</p>
                         <p className="text-sm text-gray-500 mt-2 line-clamp-2">{r.thesis}</p>
