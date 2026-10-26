@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import RiskBadge from '@/components/RiskBadge';
 import RegulatoryConcerns from '@/components/RegulatoryConcerns';
 import type { CyberEvidence, RiskClassification, DeviceRecord } from '@/lib/types';
 import type { JevAnalysisResult } from '@/lib/jevAnalysis';
@@ -90,10 +91,7 @@ export default function DeviceDetailClient({ id, data }: DeviceDetailClientProps
               <p className="text-gray-600">{r.company} • {r.panel_lead || r.lead_panel} • {r.date_of_final_decision}</p>
               <div className="flex flex-wrap gap-2 mt-3">
                 <span className="text-sm px-3 py-1 rounded-full bg-blue-50 text-blue-700 font-medium">{getRegulatoryPathway(r.submission_number)}</span>
-                <span className="text-sm px-3 py-1 rounded-full font-medium" style={{
-                  background: risk.iec62304Class === 'C' ? '#fee2e2' : risk.iec62304Class === 'B' ? '#fef9c3' : '#dcfce7',
-                  color: risk.iec62304Class === 'C' ? '#dc2626' : risk.iec62304Class === 'B' ? '#ca8a04' : '#16a34a'
-                }}>IEC 62304 Class {risk.iec62304Class}</span>
+                <RiskBadge cls={risk.iec62304Class} size="md" />
                 {risk.cyberDevice && <span className="text-sm px-3 py-1 rounded-full bg-orange-50 text-orange-700 font-medium">§524B Cyber Device</span>}
               </div>
             </div>
